@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:minHeight="?android:attr/listPreferredItemHeight"
+              android:padding="5dp"
+              android:baselineAligned="false"
+    android:background="@drawable/touch_selector">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="end|top"
+        android:paddingRight="5dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/movieNameTextViewListItem"
+            android:textAppearance="?android:textAppearance"
+            android:textSize="18sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableBottom="@drawable/movie_length"
+            android:id="@+id/movieShowMinutesTextViewListItem"
+            android:gravity="end"
+            android:textAppearance="?android:textAppearanceSmall"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/movieGenreTextViewListItem"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:paddingBottom="5dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="47dp"
+        android:layout_height="70dp"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/moviePosterImageViewListItem"
+            android:contentDescription="@string/moviePosterContentDescription"/>
+    </FrameLayout>
+
+</LinearLayout>
