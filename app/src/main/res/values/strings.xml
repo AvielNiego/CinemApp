@@ -13,4 +13,8 @@
     <string name="movie_length_icon">Movie Length</string>
     <string name="share_title">Share</string>
     <string name="share_action_string">Lets go to the movie <xliff:g id="movieName">%1$s</xliff:g>!</string>
+    <string name="today">today</string>
+    <string name="format_full_friendly_date"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
+    <string name="tomorrow">Tommorow</string>
+
 </resources>

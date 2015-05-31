@@ -2,6 +2,7 @@ package com.qmovie.qmovie.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,6 +11,9 @@ import com.qmovie.qmovie.R;
 public class MovieDetailActivity extends ActionBarActivity
 {
     public static final String DETAIL_URI = "DETAIL_URI";
+    public static final int DEFAULT_ELEVATION = 16;
+
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,6 +30,17 @@ public class MovieDetailActivity extends ActionBarActivity
 
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
         }
+
+        setToolbar();
+    }
+
+    private void setToolbar()
+    {
+        toolbar = (Toolbar) findViewById(R.id.movieDetailToolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setElevation(DEFAULT_ELEVATION);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
@@ -45,10 +60,10 @@ public class MovieDetailActivity extends ActionBarActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
+//        if (id == R.id.action_settings)
+//        {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }

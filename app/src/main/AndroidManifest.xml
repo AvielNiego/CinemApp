@@ -54,7 +54,7 @@
 
         <activity
             android:name=".ui.MovieDetailActivity"
-            android:label="@string/title_activity_movie_detail"
+            android:theme="@style/AppThemeNoActionBar"
             android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

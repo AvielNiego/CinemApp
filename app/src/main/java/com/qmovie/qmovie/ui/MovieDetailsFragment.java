@@ -118,7 +118,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                     return null;
                 }
                 return new CursorLoader(getActivity(),
-                                        MovieContract.TheaterEntry.buildTheaterWithMovieID(ContentUris.parseId(movieUri)),
+                                        MovieContract.MovieEntry.buildMovieWithShowsUri(ContentUris.parseId(movieUri)),
                                         null,
                                         null,
                                         null,
@@ -142,7 +142,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                 loadMovieDetailCursor(data);
                 break;
             case THEATER_LOADER:
-                Log.v(LOG_TAG, data.getCount() + " theaters loaded");
+                Log.v(LOG_TAG, data.getCount() + " theaters loaded!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 break;
         }
     }
@@ -162,8 +162,28 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         movieLimitAgeTextView.setText(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_LIMIT_AGE)));
         summaryTextView.setText(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY)));
 
-        Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
-                .into(moviePosterImageView);
+        Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE))).into(moviePosterImageView);
+
+//        Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
+//                .into(new Target()
+//                      {
+//                          @Override
+//                          public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
+//                          {
+//                              ((ActionBarActivity) getActivity()).getSupportActionBar()
+//                                      .setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
+//                          }
+//
+//                          @Override
+//                          public void onBitmapFailed(Drawable errorDrawable)
+//                          {
+//                          }
+//
+//                          @Override
+//                          public void onPrepareLoad(Drawable placeHolderDrawable)
+//                          {
+//                          }
+//                      });
 
         shareString = String.format(getString(R.string.share_action_string), movieName);
         if (shareActionProvider != null)

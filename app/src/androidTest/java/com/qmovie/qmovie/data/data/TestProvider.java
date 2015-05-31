@@ -24,7 +24,7 @@ public class TestProvider extends AndroidTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        //deleteAllRecords();
+        //        deleteAllRecords();
     }
 
     private void deleteAllRecords()
@@ -64,8 +64,7 @@ public class TestProvider extends AndroidTestCase
 
     public void testShowsQuery()
     {
-        Cursor cursor = getContext().getContentResolver()
-                .query(MovieContract.ShowEntry.CONTENT_URI,null,null,null,null);
+        Cursor cursor = getContext().getContentResolver().query(MovieContract.ShowEntry.CONTENT_URI, null, null, null, null);
 
         System.out.println(cursor.getCount());
 
@@ -95,6 +94,46 @@ public class TestProvider extends AndroidTestCase
             // I guess the provider isn't registered correctly.
             assertTrue("Error: MovieProvider not registered at " + mContext.getPackageName(), false);
         }
+    }
+
+    public void testInsertShow()
+    {
+        ContentValues showToInsert = new ContentValues();
+
+        Cursor queriedMovie = getContext().getContentResolver()
+                .query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null);
+        Cursor queriedTheater = getContext().getContentResolver()
+                .query(MovieContract.TheaterEntry.CONTENT_URI, null, null, null, null);
+
+        queriedMovie.moveToFirst();
+        int movieId = queriedMovie.getInt(queriedMovie.getColumnIndex(MovieContract.MovieEntry._ID));
+        queriedMovie.close();
+
+        queriedTheater.moveToFirst();
+        int theaterId = queriedTheater.getInt(queriedMovie.getColumnIndex(MovieContract.TheaterEntry._ID));
+        queriedTheater.close();
+
+        showToInsert.put(MovieContract.ShowEntry.COLUMN_MOVIE_KEY, movieId);
+        showToInsert.put(MovieContract.ShowEntry.COLUMN_THEATER_KEY, theaterId);
+        int date = 10000;
+        showToInsert.put(MovieContract.ShowEntry.COLUMN_SHOW_DATE, date);
+
+        getContext().getContentResolver()
+                .delete(MovieContract.ShowEntry.CONTENT_URI, MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " = ? AND " +
+                        MovieContract.ShowEntry.COLUMN_THEATER_KEY + " = ?", new String[]{
+                        String.valueOf(movieId), String.valueOf(theaterId)});
+        Uri insert = getContext().getContentResolver().insert(MovieContract.ShowEntry.CONTENT_URI, showToInsert);
+        long showId = ContentUris.parseId(insert);
+        Cursor queriedShow = getContext().getContentResolver()
+                .query(MovieContract.ShowEntry.CONTENT_URI, null, MovieContract.ShowEntry._ID + " = ?", new String[]{
+                        String.valueOf(showId)}, null);
+
+        assertTrue(queriedShow.moveToFirst());
+        assertEquals(queriedShow.getLong(queriedShow.getColumnIndex(MovieContract.ShowEntry.COLUMN_MOVIE_KEY)), movieId);
+        assertEquals(queriedShow.getLong(queriedShow.getColumnIndex(MovieContract.ShowEntry.COLUMN_THEATER_KEY)), theaterId);
+        assertEquals(queriedShow.getLong(queriedShow.getColumnIndex(MovieContract.ShowEntry.COLUMN_SHOW_DATE)), date);
+
+        queriedShow.close();
     }
 
     public void testInsertProvider()
@@ -141,7 +180,11 @@ public class TestProvider extends AndroidTestCase
         String movieName = testMovieValues.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_NAME);
         int moviePublishedYear = testMovieValues.getAsInteger(MovieContract.MovieEntry.COLUMN_PUBLISHED_YEAR);
         Cursor queryResult = getContext().getContentResolver()
-                .query(MovieContract.MovieEntry.buildMovieWithNameAndYearUri(movieName, moviePublishedYear), null, null, null, null);
+                .query(MovieContract.MovieEntry.buildMovieWithNameAndYearUri(movieName, moviePublishedYear),
+                       null,
+                       null,
+                       null,
+                       null);
 
         TestUtils.validateCursor("Error validating MovieEntry.", queryResult, testMovieValues);
     }

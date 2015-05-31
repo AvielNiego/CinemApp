@@ -91,8 +91,8 @@ public class UpdateDataTask
                     Log.d(LOG_TAG, "Getting " + movieID + " info. " + i + "/" + allMovies.length());
 
                     // If the movieID is a movieID and not a performance
-                    if (jsonArrayContains(allMovies, String.valueOf(movieID)) &&
-                            isMoveIsNotPerform(allMoviesAndPerformances, movieID))
+                    if (jsonArrayContains(allMovies, String.valueOf(movieID)) && isMoveIsNotPerform(allMoviesAndPerformances,
+                                                                                                    movieID))
                     {
                         JSONArray theaters = getMovieDetails(null, null, movieID).getJSONArray(MOVIE_THEATERS);
                         for (int j = 1; j < theaters.length(); j++)
@@ -104,8 +104,7 @@ public class UpdateDataTask
                             context.getContentResolver()
                                     .insert(MovieContract.TheaterEntry.CONTENT_URI, getTheaterContentValues(theater));
 
-                            JSONArray showsDates = getMovieDetails(null, theaterID, movieID)
-                                    .getJSONArray(SHOWS_DATES);
+                            JSONArray showsDates = getMovieDetails(null, theaterID, movieID).getJSONArray(SHOWS_DATES);
                             for (int k = 1; k < showsDates.length(); k++)
                             {
                                 Log.d(LOG_TAG, "Getting " + movieID + " show date");
@@ -135,8 +134,7 @@ public class UpdateDataTask
                                                                        showsToInsert.toArray(new ContentValues[showsToInsert
                                                                                .size()]));
 
-            Cursor cursor = context.getContentResolver()
-                    .query(MovieContract.ShowEntry.CONTENT_URI,null,null,null,null);
+            Cursor cursor = context.getContentResolver().query(MovieContract.ShowEntry.CONTENT_URI, null, null, null, null);
 
             System.out.println(cursor.getCount());
 
@@ -170,6 +168,7 @@ public class UpdateDataTask
     {
         ContentValues values = new ContentValues();
 
+        values.put(MovieContract.TheaterEntry._ID, theater.getString(THEATER_ID));
         values.put(MovieContract.TheaterEntry.COLUMN_THEATER_NAME, theater.getString(NAME));
         values.put(MovieContract.TheaterEntry.COLUMN_COORD_LAT, 0);
         values.put(MovieContract.TheaterEntry.COLUMN_COORD_LONG, 0);
@@ -189,22 +188,23 @@ public class UpdateDataTask
 
             if (movie != null)
             {
-                String picUrl = CINEMA_CITY_BASE_PIC_URL + movie.getString(PIC_URL);
-                ContentValues movieContentValues = MovieContract.MovieEntry.createMovieContentValues(movie.getInt(MOVIE_ID),
-                                                                                                     movie.getString(NAME),
-                                                                                                     movie.getInt(YEAR),
-                                                                                                     getCategory(
-                                                                                                             allMoviesAndPerformances
-                                                                                                                     .getJSONArray(
-                                                                                                                             CATEGORIES),
-                                                                                                             movie.getString(
-                                                                                                                     MOVIE_ID)),
-                                                                                                     getMovieSummary(movie.getString(MOVIE_ID)),
-                                                                                                     picUrl,
-                                                                                                     movie.getString(AGE_LIMIT),
-                                                                                                     movie.getInt(MOVIE_LENGTH),
-                                                                                                     "trailer dummy");
-                moviesToInsert.add(movieContentValues);
+                String category = getCategory(allMoviesAndPerformances.getJSONArray(CATEGORIES), movie.getString(MOVIE_ID));
+                if (!category.equals("ילדים") && !category.contains("ארועים"))
+                {
+                    String picUrl = CINEMA_CITY_BASE_PIC_URL + movie.getString(PIC_URL);
+                    int movieId = movie.getInt(MOVIE_ID);
+                    ContentValues movieContentValues = MovieContract.MovieEntry
+                            .createMovieContentValues(movieId,
+                                                      movie.getString(NAME),
+                                                      movie.getInt(YEAR),
+                                                      category,
+                                                      getMovieSummary(movie.getString(MOVIE_ID)),
+                                                      picUrl,
+                                                      movie.getString(AGE_LIMIT),
+                                                      movie.getInt(MOVIE_LENGTH),
+                                                      "trailer dummy");
+                    moviesToInsert.add(movieContentValues);
+                }
             }
         }
 

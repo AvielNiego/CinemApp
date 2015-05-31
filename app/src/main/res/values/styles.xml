@@ -6,6 +6,11 @@
         <item name="colorPrimaryDark">@color/mainColorDark</item>
     </style>
 
+    <style name="AppThemeNoActionBar" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
     <style name="MovieListStyle">
         <!-- Here it's a stub.  In screens of sufficient width, this style includes modifications
         for two-pane layout -->

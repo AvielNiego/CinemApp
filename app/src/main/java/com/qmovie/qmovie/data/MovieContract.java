@@ -61,9 +61,9 @@ public class MovieContract
             return CONTENT_URI.buildUpon().appendPath(movieName).appendPath(Integer.toString(moviePublishedYear)).build();
         }
 
-        public static Uri buildMovieWithShowsUri(int numberOfShows)
+        public static Uri buildMovieWithShowsUri(long movieId)
         {
-            return MOVIE_WITH_SHOW_URI.buildUpon().appendPath(String.valueOf(numberOfShows)).build();
+            return MOVIE_WITH_SHOW_URI.buildUpon().appendPath(String.valueOf(movieId)).build();
         }
 
         public static int getShowsStartDateFromUri(Uri uri)

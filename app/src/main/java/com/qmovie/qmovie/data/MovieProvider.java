@@ -127,19 +127,19 @@ public class MovieProvider extends ContentProvider
 
     private Cursor getMovieWithShowsCursor(Uri uri)
     {
-        int showsStartDate = MovieContract.MovieEntry.getShowsStartDateFromUri(uri);
+//        int showsStartDate = MovieContract.MovieEntry.getShowsStartDateFromUri(uri);
+        long movieId = ContentUris.parseId(uri);
 
-        String innerSql = "SELECT " + MovieContract.ShowEntry.COLUMN_MOVIE_KEY + ", group_concat(strftime('%H:%M'," +
-                MovieContract.ShowEntry.COLUMN_SHOW_DATE + "),',') " + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " FROM " + MovieContract.ShowEntry.TABLE_NAME + " s WHERE s." +
-                MovieContract.ShowEntry._ID + " IN (SELECT " + MovieContract.ShowEntry._ID + " FROM " +
-                MovieContract.ShowEntry.TABLE_NAME + " WHERE " + MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " = s." +
-                MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " ORDER BY " + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " LIMIT " + String
-                .valueOf(showsStartDate) + ") GROUP BY s." + MovieContract.ShowEntry.COLUMN_MOVIE_KEY;
+        String sql = "SELECT " + MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_NAME + ", " +
+                MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME + ", " +
+                MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " " +
+                " FROM " + MovieContract.MovieEntry.TABLE_NAME + ", " + MovieContract.TheaterEntry.TABLE_NAME + ", " + MovieContract.ShowEntry.TABLE_NAME +
+                " WHERE " + MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " = " +
+                MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + " AND " + MovieContract.ShowEntry.TABLE_NAME + "." +
+                MovieContract.ShowEntry.COLUMN_THEATER_KEY + " = " + MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry._ID +
+                " AND " + MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + " = ?";
 
-        String sql = "SELECT m.*, dates." + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " FROM(" + innerSql + ") dates, " + MovieContract.MovieEntry.TABLE_NAME +
-                " m WHERE dates." + MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " = m." + MovieContract.MovieEntry._ID;
-
-        return movieDBHelper.getReadableDatabase().rawQuery(sql, null);
+        return movieDBHelper.getReadableDatabase().rawQuery(sql, new String[]{String.valueOf(movieId)});
     }
 
     private Cursor getShowCursor(Uri uri, String[] projection, String sortOrder)
