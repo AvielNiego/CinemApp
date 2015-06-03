@@ -1,0 +1,10 @@
+The problem my app solves:
+There is no any easy way today for searching and ordering a 
+movie in the nearby theaters.
+Today you need to search for a good movie in IMDB or if you 
+can handle the messy interface of the Israeli theaters you 
+may use their site.
+Then you need to search for the hours the particular movie 
+is displayed in every theater.
+My app will show you the best movies and the time they are 
+displayed in every single theater.	
