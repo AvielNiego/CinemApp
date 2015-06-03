@@ -91,7 +91,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
             case MOVIE_LOADER:
                 return new CursorLoader(getActivity(),
                                         MovieContract.MovieEntry.CONTENT_URI,
-                                        MovieAdapter.projection,
+                                        MovieAdapter.PROJECTION,
                                         null,
                                         null,
                                         null);

@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.qmovie.qmovie.R;
@@ -29,19 +30,21 @@ import com.squareup.picasso.Picasso;
 
 public class MovieDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
-    private static final int    DETAIL_LOADER  = 0;
-    private static final int    THEATER_LOADER = 1;
-    public static final  String LOG_TAG        = MovieDetailsFragment.class.getSimpleName();
+    private static final int    DETAIL_LOADER = 0;
+    private static final int    SHOWS_LOADER  = 1;
+    public static final  String LOG_TAG       = MovieDetailsFragment.class.getSimpleName();
 
     private TextView  movieNameTextView;
     private TextView  movieGenreTextView;
     private TextView  movieLimitAgeTextView;
     private TextView  summaryTextView;
     private ImageView moviePosterImageView;
+    private ImageView toolbarMoviePoster;
     private Uri       movieUri;
 
     private String              shareString;
     private ShareActionProvider shareActionProvider;
+    private MovieShowsAdapter   movieShowAdapter;
 
 
     public MovieDetailsFragment()
@@ -80,6 +83,11 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         initDataMembers(rootView);
+
+        movieShowAdapter = new MovieShowsAdapter(getActivity(), null, 0);
+        ListView showsListView = (ListView) rootView.findViewById(R.id.showsListView);
+        showsListView.setAdapter(movieShowAdapter);
+
         return rootView;
     }
 
@@ -90,6 +98,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         movieGenreTextView = (TextView) rootView.findViewById(R.id.movieGenreTextViewDetail);
         movieLimitAgeTextView = (TextView) rootView.findViewById(R.id.movieLimitAgeTextViewDetail);
         summaryTextView = (TextView) rootView.findViewById(R.id.movieSummaryTextViewDetail);
+        //        toolbarMoviePoster = ((ImageView) getActivity().findViewById(R.id.toolbarMoviePoster));
         summaryTextView.setMovementMethod(new ScrollingMovementMethod());
     }
 
@@ -98,7 +107,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
-        getLoaderManager().initLoader(THEATER_LOADER, null, this);
+        getLoaderManager().initLoader(SHOWS_LOADER, null, this);
     }
 
     @Override
@@ -112,14 +121,14 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                     return null;
                 }
                 return new CursorLoader(getActivity(), movieUri, null, null, null, null);
-            case THEATER_LOADER:
+            case SHOWS_LOADER:
                 if (movieUri == null)
                 {
                     return null;
                 }
                 return new CursorLoader(getActivity(),
                                         MovieContract.MovieEntry.buildMovieWithShowsUri(ContentUris.parseId(movieUri)),
-                                        null,
+                                        MovieShowsAdapter.PROJECTION,
                                         null,
                                         null,
                                         null);
@@ -141,8 +150,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             case DETAIL_LOADER:
                 loadMovieDetailCursor(data);
                 break;
-            case THEATER_LOADER:
-                Log.v(LOG_TAG, data.getCount() + " theaters loaded!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            case SHOWS_LOADER:
+                movieShowAdapter.swapCursor(data);
                 break;
         }
     }
@@ -150,7 +159,14 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader)
     {
-        Log.v(LOG_TAG, String.valueOf(loader.getId()));
+        switch (loader.getId())
+        {
+            case DETAIL_LOADER:
+                break;
+            case SHOWS_LOADER:
+                movieShowAdapter.swapCursor(null);
+                break;
+        }
     }
 
     public void loadMovieDetailCursor(Cursor data)
@@ -162,28 +178,17 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         movieLimitAgeTextView.setText(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_LIMIT_AGE)));
         summaryTextView.setText(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY)));
 
-        Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE))).into(moviePosterImageView);
+        Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
+                .into(moviePosterImageView);
 
-//        Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
-//                .into(new Target()
-//                      {
-//                          @Override
-//                          public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from)
-//                          {
-//                              ((ActionBarActivity) getActivity()).getSupportActionBar()
-//                                      .setBackgroundDrawable(new BitmapDrawable(getResources(), bitmap));
-//                          }
-//
-//                          @Override
-//                          public void onBitmapFailed(Drawable errorDrawable)
-//                          {
-//                          }
-//
-//                          @Override
-//                          public void onPrepareLoad(Drawable placeHolderDrawable)
-//                          {
-//                          }
-//                      });
+        if (toolbarMoviePoster != null)
+        {
+            int widthPixels = getActivity().getResources().getDisplayMetrics().widthPixels;
+            final float scale = getActivity().getResources().getDisplayMetrics().density;
+            int heightPixels = (int) getResources().getDimension(R.dimen.toolbar_height);
+            Picasso.with(getActivity()).load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
+                    .resize(widthPixels, heightPixels).centerCrop().into(toolbarMoviePoster);
+        }
 
         shareString = String.format(getString(R.string.share_action_string), movieName);
         if (shareActionProvider != null)

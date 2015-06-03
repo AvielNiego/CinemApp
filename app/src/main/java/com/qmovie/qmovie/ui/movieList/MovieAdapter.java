@@ -16,7 +16,7 @@ import com.squareup.picasso.Picasso;
 
 public class MovieAdapter extends CursorAdapter
 {
-    public static String[] projection = {
+    public static final String[] PROJECTION = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_NAME,
             MovieContract.MovieEntry.COLUMN_PUBLISHED_YEAR,

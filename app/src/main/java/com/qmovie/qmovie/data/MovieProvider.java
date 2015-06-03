@@ -63,9 +63,6 @@ public class MovieProvider extends ContentProvider
 
         switch (uriMatcher.match(uri))
         {
-            case SHOW:
-                queryResult = getShowCursor(uri, projection, sortOrder);
-                break;
             case MOVIE:
                 queryResult = movieDBHelper.getReadableDatabase().query(MovieContract.MovieEntry.TABLE_NAME,
                                                                         projection,
@@ -98,7 +95,7 @@ public class MovieProvider extends ContentProvider
                                                                         sortOrder);
                 break;
             case MOVIE_WITH_SHOWS:
-                queryResult = getMovieWithShowsCursor(uri);
+                queryResult = getMovieWithShowsCursor(uri, projection);
                 break;
             case THEATER:
                 queryResult = movieDBHelper.getReadableDatabase().query(MovieContract.TheaterEntry.TABLE_NAME,
@@ -125,39 +122,30 @@ public class MovieProvider extends ContentProvider
         return queryResult;
     }
 
-    private Cursor getMovieWithShowsCursor(Uri uri)
+    private Cursor getMovieWithShowsCursor(Uri uri, String[] projection)
     {
-//        int showsStartDate = MovieContract.MovieEntry.getShowsStartDateFromUri(uri);
         long movieId = ContentUris.parseId(uri);
 
-        String sql = "SELECT " + MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_NAME + ", " +
-                MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME + ", " +
-                MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " " +
-                " FROM " + MovieContract.MovieEntry.TABLE_NAME + ", " + MovieContract.TheaterEntry.TABLE_NAME + ", " + MovieContract.ShowEntry.TABLE_NAME +
-                " WHERE " + MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " = " +
-                MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + " AND " + MovieContract.ShowEntry.TABLE_NAME + "." +
-                MovieContract.ShowEntry.COLUMN_THEATER_KEY + " = " + MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry._ID +
-                " AND " + MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + " = ?";
+        return showsJoinedTable.query(movieDBHelper.getReadableDatabase(),
+                                      projection,
+                                      MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + "= ? AND " + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " > ?",
+                                      new String[]{
+                                              String.valueOf(movieId), String.valueOf(System.currentTimeMillis())},
+                                      null,
+                                      null,
+                                      MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME + " DESC," + MovieContract.ShowEntry.COLUMN_SHOW_DATE);
 
-        return movieDBHelper.getReadableDatabase().rawQuery(sql, new String[]{String.valueOf(movieId)});
-    }
-
-    private Cursor getShowCursor(Uri uri, String[] projection, String sortOrder)
-    {
-        Cursor queryResult;
-        long startDate = MovieContract.ShowEntry.getStartDateFromUri(uri);
-
-        String selection = null;
-        String[] selectionArgs = null;
-        if (startDate != 0)
-        {
-            selection = MovieContract.ShowEntry.COLUMN_SHOW_DATE + " > ?";
-            selectionArgs = new String[]{Long.toString(startDate)};
-        }
-
-        queryResult = showsJoinedTable
-                .query(movieDBHelper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
-        return queryResult;
+        //        String sql = "SELECT " + MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry._ID + ", " + MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_NAME + ", " +
+        //                MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME + ", " +
+        //                MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_SHOW_DATE +
+        //                " FROM " + MovieContract.MovieEntry.TABLE_NAME + ", " + MovieContract.TheaterEntry.TABLE_NAME + ", " + MovieContract.ShowEntry.TABLE_NAME +
+        //                " WHERE " + MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_MOVIE_KEY + " = " +
+        //                MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + " AND " + MovieContract.ShowEntry.TABLE_NAME + "." +
+        //                MovieContract.ShowEntry.COLUMN_THEATER_KEY + " = " + MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry._ID +
+        //                " AND " + MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID + " = ? AND " + MovieContract.ShowEntry.COLUMN_SHOW_DATE + " > ? ORDER BY " + MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME + " DESC," + MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_SHOW_DATE;
+        //
+        //        return movieDBHelper.getReadableDatabase().rawQuery(sql, new String[]{
+        //                String.valueOf(movieId), String.valueOf(System.currentTimeMillis())});
     }
 
     @Override

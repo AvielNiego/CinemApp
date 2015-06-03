@@ -2,7 +2,6 @@ package com.qmovie.qmovie.data;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -119,6 +118,11 @@ public class UpdateDataTask
                                                                                            theaterID);
                                     showsToInsert.add(showContentValues);
                                 }
+
+                                context.getContentResolver().bulkInsert(MovieContract.ShowEntry.CONTENT_URI,
+                                                                        showsToInsert.toArray(new ContentValues[showsToInsert
+                                                                                .size()]));
+                                showsToInsert.clear();
                             }
                         }
                     }
@@ -126,22 +130,8 @@ public class UpdateDataTask
                 {
                     Log.v(LOG_TAG, "Couldn't load movie number " + i);
                 }
-
             }
             Log.d(LOG_TAG, "Done receiving information from internet");
-
-            int rowsInserted = context.getContentResolver().bulkInsert(MovieContract.ShowEntry.CONTENT_URI,
-                                                                       showsToInsert.toArray(new ContentValues[showsToInsert
-                                                                               .size()]));
-
-            Cursor cursor = context.getContentResolver().query(MovieContract.ShowEntry.CONTENT_URI, null, null, null, null);
-
-            System.out.println(cursor.getCount());
-
-            cursor.close();
-
-            Log.v(LOG_TAG, rowsInserted + " show rows inserted");
-
         } catch (JSONException e)
         {
             e.printStackTrace();
@@ -189,20 +179,23 @@ public class UpdateDataTask
             if (movie != null)
             {
                 String category = getCategory(allMoviesAndPerformances.getJSONArray(CATEGORIES), movie.getString(MOVIE_ID));
-                if (!category.equals("ילדים") && !category.contains("ארועים"))
+                if (!category.equals(""))
                 {
                     String picUrl = CINEMA_CITY_BASE_PIC_URL + movie.getString(PIC_URL);
                     int movieId = movie.getInt(MOVIE_ID);
-                    ContentValues movieContentValues = MovieContract.MovieEntry
-                            .createMovieContentValues(movieId,
-                                                      movie.getString(NAME),
-                                                      movie.getInt(YEAR),
-                                                      category,
-                                                      getMovieSummary(movie.getString(MOVIE_ID)),
-                                                      picUrl,
-                                                      movie.getString(AGE_LIMIT),
-                                                      movie.getInt(MOVIE_LENGTH),
-                                                      "trailer dummy");
+                    ContentValues movieContentValues = MovieContract.MovieEntry.createMovieContentValues(movieId,
+                                                                                                         movie.getString(NAME),
+                                                                                                         movie.getInt(YEAR),
+                                                                                                         category,
+                                                                                                         getMovieSummary(
+                                                                                                                 movie.getString(
+                                                                                                                         MOVIE_ID)),
+                                                                                                         picUrl,
+                                                                                                         movie.getString(
+                                                                                                                 AGE_LIMIT),
+                                                                                                         movie.getInt(
+                                                                                                                 MOVIE_LENGTH),
+                                                                                                         "trailer dummy");
                     moviesToInsert.add(movieContentValues);
                 }
             }
@@ -295,13 +288,16 @@ public class UpdateDataTask
     {
         String category = "";
 
-        for (int i = 0; i < categories.length() && i != 6; i++)
+        for (int i = 0; i < categories.length(); i++)
         {
-            JSONObject currentCategory = categories.getJSONObject(i);
-            if (jsonArrayContains(currentCategory.getJSONArray(MOVIE_LIST_IN_CATEGORY), movieId))
+            if (i != 6 && i != 5 && i != 4 && i != 3)
             {
-                String categoryName = currentCategory.getString(NAME);
-                category = category.isEmpty() ? categoryName : category + ", " + categoryName;
+                JSONObject currentCategory = categories.getJSONObject(i);
+                if (jsonArrayContains(currentCategory.getJSONArray(MOVIE_LIST_IN_CATEGORY), movieId))
+                {
+                    String categoryName = currentCategory.getString(NAME);
+                    category = category.isEmpty() ? categoryName : category + ", " + categoryName;
+                }
             }
         }
 

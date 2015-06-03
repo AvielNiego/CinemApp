@@ -23,6 +23,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.MovieDetailActivity"
+            android:theme="@style/AppThemeNoActionBar"
+            android:parentActivityName=".ui.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.qmovie.qmovie.ui.MainActivity" />
+        </activity>
         <!-- SyncAdapter's dummy authentication service -->
         <service android:name=".sync.CinemappAuthenticatorService" >
             <intent-filter>
@@ -52,14 +60,7 @@
             android:exported="false"
             android:syncable="true" />
 
-        <activity
-            android:name=".ui.MovieDetailActivity"
-            android:theme="@style/AppThemeNoActionBar"
-            android:parentActivityName=".ui.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.qmovie.qmovie.ui.MainActivity" />
-        </activity>
+        <receiver android:name=".ui.RemainderReceiver" android:process=":remote"/>
     </application>
 
 </manifest>
