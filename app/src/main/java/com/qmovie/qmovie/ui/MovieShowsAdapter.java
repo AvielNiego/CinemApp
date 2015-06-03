@@ -71,7 +71,6 @@ public class MovieShowsAdapter extends CursorAdapter
                 alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
                 alarmMgr.set(AlarmManager.RTC_WAKEUP, showDate - 15 * 60 * 1000, alarmIntent);
-                //                alarmMgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
 
                 Snackbar.make(v,
                               context.getString(R.string.snackbar_remainder_set_text, friendlyDayString),
