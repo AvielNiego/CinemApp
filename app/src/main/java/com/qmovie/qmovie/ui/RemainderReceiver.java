@@ -13,6 +13,7 @@ import com.qmovie.qmovie.R;
 
 public class RemainderReceiver extends BroadcastReceiver
 {
+    public static final  String ROOT_ACTIVITY = "root_activity";
     public static final  String MOVIE_NAME_EXTRA_KEY = "movie_name";
     private static final int    NOTIFICATION_ID      = 1;
 
@@ -31,8 +32,10 @@ public class RemainderReceiver extends BroadcastReceiver
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).setAutoCancel(true)
         .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText(contentText));
 
-        Intent resultIntent = new Intent(context, MovieDetailActivity.class);
+
+        Intent resultIntent = new Intent(context, (Class<?>) intent.getExtras().get(ROOT_ACTIVITY));
         resultIntent.setData(intent.getData());
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         // The stack builder object will contain an artificial back stack for the
         // started Activity.

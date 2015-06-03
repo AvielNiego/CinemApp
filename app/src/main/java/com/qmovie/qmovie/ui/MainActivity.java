@@ -44,7 +44,6 @@ public class MainActivity extends ActionBarActivity implements MovieListFragment
         CinemappSyncAdapter.initializeSyncAdapter(this);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -90,6 +89,16 @@ public class MainActivity extends ActionBarActivity implements MovieListFragment
         {
             replaceMovieFragment(firstItemUri);
             getMovieListFragment().selectFirstItem();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        if(intent.getData()!=null)
+        {
+            replaceMovieFragment(intent.getData());
         }
     }
 

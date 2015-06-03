@@ -72,6 +72,8 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -80,6 +82,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         {
             movieUri = args.getParcelable(MovieDetailActivity.DETAIL_URI);
         }
+
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         initDataMembers(rootView);

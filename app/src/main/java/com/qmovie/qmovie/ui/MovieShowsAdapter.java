@@ -46,7 +46,7 @@ public class MovieShowsAdapter extends CursorAdapter
     }
 
     @Override
-    public void bindView(View view, final Context context,final Cursor cursor)
+    public void bindView(View view, final Context context, final Cursor cursor)
     {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
@@ -64,11 +64,14 @@ public class MovieShowsAdapter extends CursorAdapter
                 final PendingIntent alarmIntent;
 
                 alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                Intent intent = new Intent(context, RemainderReceiver.class).setData(((Activity) context).getIntent().getData());
+                Activity rootActivity = (Activity) context;
+                Intent intent = new Intent(context, RemainderReceiver.class).setData(rootActivity.getIntent().getData());
                 intent.putExtra(RemainderReceiver.MOVIE_NAME_EXTRA_KEY, cursor.getString(MOVIE_NAME_COLUMN_INDEX));
+                intent.putExtra(RemainderReceiver.ROOT_ACTIVITY, rootActivity.getClass());
                 alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
-                alarmMgr.set(AlarmManager.RTC_WAKEUP, showDate - 15 * 1000, alarmIntent);
+                alarmMgr.set(AlarmManager.RTC_WAKEUP, showDate - 15 * 60 * 1000, alarmIntent);
+                //                alarmMgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
 
                 Snackbar.make(v,
                               context.getString(R.string.snackbar_remainder_set_text, friendlyDayString),
@@ -83,7 +86,6 @@ public class MovieShowsAdapter extends CursorAdapter
             }
         });
     }
-
 
 
     private class ViewHolder
