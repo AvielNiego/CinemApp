@@ -3,7 +3,7 @@ package com.qmovie.qmovie.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,7 +12,7 @@ import com.qmovie.qmovie.sync.CinemappSyncAdapter;
 import com.qmovie.qmovie.ui.movieList.MovieListFragment;
 
 
-public class MainActivity extends ActionBarActivity implements MovieListFragment.Callback
+public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback
 {
     private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
     private boolean twoPane;

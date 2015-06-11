@@ -1,14 +1,14 @@
 package com.qmovie.qmovie.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.qmovie.qmovie.R;
 
-public class MovieDetailActivity extends ActionBarActivity
+public class MovieDetailActivity extends AppCompatActivity
 {
     public static final String DETAIL_URI = "DETAIL_URI";
     public static final int DEFAULT_ELEVATION = 16;

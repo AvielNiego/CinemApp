@@ -6,6 +6,8 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,7 +16,7 @@ import com.qmovie.qmovie.Utilities;
 import com.qmovie.qmovie.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
-public class MovieAdapter extends CursorAdapter
+public class MovieAdapter extends CursorAdapter implements Filterable
 {
     public static final String[] PROJECTION = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
@@ -73,5 +75,17 @@ public class MovieAdapter extends CursorAdapter
             this.movieShowLength = (TextView) view.findViewById(R.id.movieShowMinutesTextViewListItem);
             this.moviePoster = (ImageView) view.findViewById(R.id.moviePosterImageViewListItem);
         }
+    }
+
+    @Override
+    public CharSequence convertToString(Cursor cursor)
+    {
+        return cursor.getString(MOVIE_NAME_COLUMN_INDEX);
+    }
+
+    @Override
+    public Filter getFilter()
+    {
+        return super.getFilter();
     }
 }

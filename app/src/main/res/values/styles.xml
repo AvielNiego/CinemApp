@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/mainColor</item>
         <item name="colorPrimaryDark">@color/mainColorDark</item>
+        <item name="searchViewStyle">@style/AppTheme.SearchView</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="AppTheme">
@@ -14,6 +15,10 @@
     <style name="MovieListStyle">
         <!-- Here it's a stub.  In screens of sufficient width, this style includes modifications
         for two-pane layout -->
+    </style>
+
+    <style name="AppTheme.SearchView" parent="Widget.AppCompat.SearchView">
+
     </style>
 
 </resources>
