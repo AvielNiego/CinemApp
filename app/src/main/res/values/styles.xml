@@ -4,7 +4,6 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/mainColor</item>
         <item name="colorPrimaryDark">@color/mainColorDark</item>
-        <item name="searchViewStyle">@style/AppTheme.SearchView</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="AppTheme">
@@ -17,8 +16,15 @@
         for two-pane layout -->
     </style>
 
-    <style name="AppTheme.SearchView" parent="Widget.AppCompat.SearchView">
-
+    <style name="AudioFileInfoOverlayText">
+        <item name="android:paddingLeft">4px</item>
+        <item name="android:paddingBottom">4px</item>
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">3</item>
+        <item name="android:shadowDy">3</item>
+        <item name="android:shadowRadius">4</item>
     </style>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.qmovie.qmovie.ui;
+package com.qmovie.qmovie.ui.movieDetail;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +12,6 @@ public class MovieDetailActivity extends AppCompatActivity
 {
     public static final String DETAIL_URI = "DETAIL_URI";
     public static final int DEFAULT_ELEVATION = 16;
-
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -36,7 +34,7 @@ public class MovieDetailActivity extends AppCompatActivity
 
     private void setToolbar()
     {
-        toolbar = (Toolbar) findViewById(R.id.movieDetailToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.movieDetailToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setElevation(DEFAULT_ELEVATION);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

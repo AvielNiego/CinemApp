@@ -9,6 +9,8 @@ import android.view.MenuItem;
 
 import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.sync.CinemappSyncAdapter;
+import com.qmovie.qmovie.ui.movieDetail.MovieDetailActivity;
+import com.qmovie.qmovie.ui.movieDetail.MovieDetailsFragment;
 import com.qmovie.qmovie.ui.movieList.MovieListFragment;
 
 
