@@ -81,6 +81,23 @@ public class MovieProvider extends ContentProvider
                 System.arraycopy(projection, 0, countProjection, 0, projection.length);
                 countProjection[projection.length] = "COUNT(*)";
 
+                // Make sure the shows are relevant
+                String dateSelection = "show_date > ?";
+                selection = selection==null? dateSelection : selection + " and " + dateSelection;
+                if (selectionArgs == null)
+                {
+                    selectionArgs = new String[]{String.valueOf(System.currentTimeMillis())};
+                }
+                else
+                {
+                    // Add new parameter to the selectionArgs
+                    String[] selectionArgsWithDateSelection = new String[selectionArgs.length + 1];
+                    System.arraycopy(selectionArgs, 0, selectionArgsWithDateSelection, 0, selectionArgs.length);
+                    selectionArgsWithDateSelection[selectionArgsWithDateSelection.length - 1] = String
+                            .valueOf(System.currentTimeMillis());
+                    selectionArgs = selectionArgsWithDateSelection;
+                }
+
                 queryResult = movieShowJoinedTable.query(movieDBHelper.getReadableDatabase(),
                                                          countProjection,
                                                          selection,

@@ -182,7 +182,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         if (movieCollapsingToolbarLayout != null)
         {
             movieCollapsingToolbarLayout.setTitle(movieName);
-            movieCollapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.AudioFileInfoOverlayText);
+            movieCollapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.BackgroundedText);
             final ImageView toolbarMoviePoster = ((ImageView) movieCollapsingToolbarLayout.findViewById(R.id.toolbarMoviePoster));
             if (toolbarMoviePoster != null)
             {

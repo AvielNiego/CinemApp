@@ -83,6 +83,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
 
+    // For big screen - master detail view
     public void selectFirstItem()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
