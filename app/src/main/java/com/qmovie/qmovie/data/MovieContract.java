@@ -40,11 +40,11 @@ public class MovieContract
         public static final String COLUMN_GENRE          = "genre";
         public static final String COLUMN_SUMMARY        = "summary";
         public static final String COLUMN_PICTURE        = "pic";
-        public static final String COLUMN_LIMIT_AGE      = "age";
+        public static final String COLUMN_AGE_LIMIT      = "age";
         public static final String COLUMN_MOVIE_LENGTH   = "length";
         public static final String COLUMN_TRAILER        = "trailer";
 
-        public static final Uri CONTENT_URI         = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+        public static final  Uri CONTENT_URI         = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
         private static final Uri MOVIE_WITH_SHOW_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE)
                 .appendPath(PATH_SHOW).build();
 
@@ -81,7 +81,7 @@ public class MovieContract
             return Integer.parseInt(uri.getPathSegments().get(2));
         }
 
-        public static ContentValues createMovieContentValues(long id,String movieName, int publishedYear, String genre,
+        public static ContentValues createMovieContentValues(long id, String movieName, int publishedYear, String genre,
                                                              String summary, String pictureUrl, String limitAge,
                                                              int movieLength, String trailer)
         {
@@ -93,7 +93,7 @@ public class MovieContract
             movieContentValues.put(COLUMN_GENRE, genre);
             movieContentValues.put(COLUMN_SUMMARY, summary);
             movieContentValues.put(COLUMN_PICTURE, pictureUrl);
-            movieContentValues.put(COLUMN_LIMIT_AGE, limitAge);
+            movieContentValues.put(COLUMN_AGE_LIMIT, limitAge);
             movieContentValues.put(COLUMN_MOVIE_LENGTH, movieLength);
             movieContentValues.put(COLUMN_TRAILER, trailer);
 

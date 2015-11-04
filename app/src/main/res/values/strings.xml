@@ -21,5 +21,6 @@
     <string name="cancel">Cancel</string>
     <string name="movie_remainder_title">The movie is starting!</string>
     <string name="movie_remainder_text">The movie <xliff:g id="day">%1$s</xliff:g> is now starting</string>
+    <string name="search">Search</string>
 
 </resources>

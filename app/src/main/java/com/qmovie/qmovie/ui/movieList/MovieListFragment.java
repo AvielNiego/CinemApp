@@ -11,7 +11,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,19 +27,23 @@ import com.qmovie.qmovie.data.MovieContract;
 
 public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
-    private static final int    HANDLER_WHAT = 1;
-    private static final int    MOVIE_LOADER = 10;
-    private static final String SELECTED_KEY = "ITEM_SELECTED_POSITION";
+    private static final int    HANDLER_WHAT    = 1;
+    private static final int    MOVIE_LOADER    = 10;
+    private static final String SELECTED_KEY    = "ITEM_SELECTED_POSITION";
+    private static final String NEW_SEARCH_TEXT = "search_text";
 
     private int itemSelectedPosition = ListView.INVALID_POSITION;
     private MovieAdapter movieAdapter;
     private ListView     movieListView;
+
+    private String searchText;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -43,6 +52,8 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         movieAdapter = new MovieAdapter(getActivity(), null, 0);
+        movieAdapter.setSearchString(searchText);
+
         initMovieListView(rootView);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY))
@@ -67,14 +78,15 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null)
                 {
-                    ((Callback) getActivity())
-                            .onItemSelected(MovieContract.MovieEntry.buildMovieUri(cursor.getLong(MovieAdapter.MOVIE_ID_COLUMN_INDEX)));
+                    ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry
+                                                                      .buildMovieUri(cursor.getLong(MovieAdapter.MOVIE_ID_COLUMN_INDEX)));
                 }
             }
         });
     }
 
 
+    // For big screen - master detail view
     public void selectFirstItem()
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
@@ -89,11 +101,18 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         switch (i)
         {
             case MOVIE_LOADER:
+                String selection = null;
+                String[] selectionArgs = null;
+                if (bundle != null)
+                {
+                    selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_NAME + " LIKE ?";
+                    selectionArgs = new String[]{"%" + bundle.getString(NEW_SEARCH_TEXT) + "%"};
+                }
                 return new CursorLoader(getActivity(),
                                         MovieContract.MovieEntry.CONTENT_URI,
                                         MovieAdapter.PROJECTION,
-                                        null,
-                                        null,
+                                        selection,
+                                        selectionArgs,
                                         null);
             default:
                 return null;
@@ -107,6 +126,11 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         switch (loader.getId())
         {
             case MOVIE_LOADER:
+                if (data.moveToFirst())
+                {
+                    getActivity().findViewById(R.id.movieListProgressBar).setVisibility(View.GONE);
+                }
+                movieAdapter.setSearchString(searchText);
                 movieAdapter.swapCursor(data);
                 if (itemSelectedPosition != ListView.INVALID_POSITION)
                 {
@@ -129,6 +153,42 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
                 movieAdapter.swapCursor(null);
                 break;
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        initSearchView(menu);
+    }
+
+    public void initSearchView(Menu menu)
+    {
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
+        {
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText)
+            {
+                searchText = newText;
+                Bundle args = null;
+                if (!searchText.isEmpty())
+                {
+                    args = new Bundle();
+                    args.putString(NEW_SEARCH_TEXT, searchText);
+                }
+                getLoaderManager().restartLoader(MOVIE_LOADER, args, MovieListFragment.this);
+                return false;
+            }
+        });
     }
 
     private static class NotifyDataUpdated extends Handler
@@ -173,8 +233,8 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Uri movieUri);
+        void onItemSelected(Uri movieUri);
 
-        public void onDataUpdate(Uri firstItemUri);
+        void onDataUpdate(Uri firstItemUri);
     }
 }

@@ -10,6 +10,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
 
 import com.qmovie.qmovie.R;
+import com.qmovie.qmovie.ui.movieDetail.MovieDetailActivity;
 
 public class RemainderReceiver extends BroadcastReceiver
 {

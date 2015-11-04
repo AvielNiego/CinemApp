@@ -1,8 +1,22 @@
 package com.qmovie.qmovie;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.format.Time;
+import android.text.style.ForegroundColorSpan;
+import android.widget.EdgeEffect;
+import android.widget.TextView;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -14,6 +28,40 @@ public class Utilities
         int hours = minuets / 60; //since both are ints, you get an int
         int minutes = minuets % 60;
         return context.getString(R.string.showLength, String.format("%d:%02d", hours, minutes));
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
+
+    public static void setEdgeGlowColor(final RecyclerView recyclerView, final int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                final Class<?> clazz = RecyclerView.class;
+                for (final String name : new String[] {"ensureTopGlow", "ensureBottomGlow"}) {
+                    Method method = clazz.getDeclaredMethod(name);
+                    method.setAccessible(true);
+                    method.invoke(recyclerView);
+                }
+                for (final String name : new String[] {"mTopGlow", "mBottomGlow"}) {
+                    final Field field = clazz.getDeclaredField(name);
+                    field.setAccessible(true);
+                    final Object edge = field.get(recyclerView); // android.support.v4.widget.EdgeEffectCompat
+                    final Field fEdgeEffect = edge.getClass().getDeclaredField("mEdgeEffect");
+                    fEdgeEffect.setAccessible(true);
+                    ((EdgeEffect) fEdgeEffect.get(edge)).setColor(color);
+                }
+            } catch (final Exception ignored) {}
+        }
     }
 
     public static String getFriendlyDayString(Context context, long dateInMillis) {
@@ -86,5 +134,25 @@ public class Utilities
             SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
             return dayFormat.format(dateInMillis);
         }
+    }
+
+    public static void highlightTextInTextView(TextView textView,@Nullable String textToHighlight, int color)
+    {
+        String originalText = String.valueOf(textView.getText());
+        Spannable wordToSpan = new SpannableString(originalText);
+
+        if (textToHighlight == null || textToHighlight.isEmpty())
+        {
+            return;
+        }
+
+        int i = originalText.toLowerCase().indexOf(textToHighlight.toLowerCase());
+        while (i != -1)
+        {
+            wordToSpan.setSpan(new ForegroundColorSpan(color), i, i + textToHighlight.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            i = originalText.indexOf(textToHighlight, i + 1);
+        }
+
+        textView.setText(wordToSpan);
     }
 }

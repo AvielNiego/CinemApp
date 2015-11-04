@@ -37,7 +37,7 @@ public class TestUtils extends AndroidTestCase
         testValues.put(MovieEntry.COLUMN_PICTURE, "https://scontent-lhr.xx.fbcdn.net/hphotos-xfp1/v/t1.0-9/71422_10202906986947657_2881714353852244906_n.jpg?oh=caa8fcc856a24b79f4952cc98d1ac201&oe=55AF59D9");
         testValues.put(MovieEntry.COLUMN_MOVIE_LENGTH, 2900);
         testValues.put(MovieEntry.COLUMN_PUBLISHED_YEAR, YEAR_COUNTER);
-        testValues.put(MovieEntry.COLUMN_LIMIT_AGE, 18);
+        testValues.put(MovieEntry.COLUMN_AGE_LIMIT, 18);
         testValues.put(MovieEntry.COLUMN_TRAILER, "http://www.google.com/");
 
         return testValues;
