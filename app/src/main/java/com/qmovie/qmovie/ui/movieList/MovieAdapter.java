@@ -33,10 +33,21 @@ public class MovieAdapter extends CursorAdapter implements Filterable
     public static final int MOVIE_LENGTH_COLUMN_INDEX         = 4;
     public static final int MOVIE_POSTER_COLUMN_INDEX         = 5;
 
+    private String searchString;
 
     public MovieAdapter(Context context, Cursor c, int flags)
     {
         super(context, c, flags);
+    }
+
+    public String getSearchString()
+    {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString)
+    {
+        this.searchString = searchString;
     }
 
     @Override
@@ -53,7 +64,10 @@ public class MovieAdapter extends CursorAdapter implements Filterable
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         String movieName = cursor.getString(MOVIE_NAME_COLUMN_INDEX);
+
         viewHolder.nameTextView.setText(movieName);
+        Utilities.highlightTextInTextView(viewHolder.nameTextView, searchString, R.attr.colorPrimary);
+
         viewHolder.genreTextView.setText(cursor.getString(MOVIE_GENRE_COLUMN_INDEX));
         viewHolder.movieShowLength.setText(Utilities.getReadableLength(context, cursor.getInt(MOVIE_LENGTH_COLUMN_INDEX)));
 

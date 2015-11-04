@@ -36,6 +36,8 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private MovieAdapter movieAdapter;
     private ListView     movieListView;
 
+    private String searchText;
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
@@ -50,6 +52,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         movieAdapter = new MovieAdapter(getActivity(), null, 0);
+        movieAdapter.setSearchString(searchText);
 
         initMovieListView(rootView);
 
@@ -127,6 +130,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
                 {
                     getActivity().findViewById(R.id.movieListProgressBar).setVisibility(View.GONE);
                 }
+                movieAdapter.setSearchString(searchText);
                 movieAdapter.swapCursor(data);
                 if (itemSelectedPosition != ListView.INVALID_POSITION)
                 {
@@ -174,11 +178,12 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
             @Override
             public boolean onQueryTextChange(final String newText)
             {
+                searchText = newText;
                 Bundle args = null;
-                if (!newText.equals(""))
+                if (!searchText.isEmpty())
                 {
                     args = new Bundle();
-                    args.putString(NEW_SEARCH_TEXT, newText);
+                    args.putString(NEW_SEARCH_TEXT, searchText);
                 }
                 getLoaderManager().restartLoader(MOVIE_LOADER, args, MovieListFragment.this);
                 return false;

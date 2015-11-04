@@ -1,5 +1,8 @@
 package com.qmovie.qmovie.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,8 +20,10 @@ import com.qmovie.qmovie.ui.movieList.MovieListFragment;
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback
 {
     private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
-    private boolean twoPane;
-    private boolean hasSavedInstanceState;
+    public static final int TIME_TO_WAIT_BEFORE_RESTART = 500;
+
+    private boolean           twoPane;
+    private boolean           hasSavedInstanceState;
     private MovieListFragment movieListFragment;
 
     public MovieListFragment getMovieListFragment()
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        restartApplicationWhenFC();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -44,6 +50,22 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         hasSavedInstanceState = (savedInstanceState != null);
 
         CinemappSyncAdapter.initializeSyncAdapter(this);
+    }
+
+    private void restartApplicationWhenFC()
+    {
+        final PendingIntent intent = PendingIntent.getActivity(getBaseContext(), 0, new Intent(getIntent()), 0);
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex)
+            {
+                AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + TIME_TO_WAIT_BEFORE_RESTART, intent);
+                System.exit(2);
+            }
+        });
     }
 
     @Override
@@ -63,10 +85,10 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings)
-//        {
-//            return true;
-//        }
+        //        if (id == R.id.action_settings)
+        //        {
+        //            return true;
+        //        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -78,7 +100,9 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         if (twoPane)
         {
             replaceMovieFragment(movieUri);
-        } else {
+        }
+        else
+        {
             Intent intent = new Intent(this, MovieDetailActivity.class).setData(movieUri);
             startActivity(intent);
         }
@@ -98,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        if(intent.getData()!=null)
+        if (intent.getData() != null)
         {
             replaceMovieFragment(intent.getData());
         }
@@ -112,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         MovieDetailsFragment fragment = new MovieDetailsFragment();
         fragment.setArguments(args);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.movieDetailContainer, fragment, DETAIL_FRAGMENT_TAG).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.movieDetailContainer, fragment, DETAIL_FRAGMENT_TAG)
+                .commit();
     }
 }

@@ -1,26 +1,20 @@
 package com.qmovie.qmovie.ui.movieDetail;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.Utilities;
 import com.qmovie.qmovie.data.MovieContract;
-import com.qmovie.qmovie.ui.RemainderReceiver;
 import com.squareup.picasso.Picasso;
 
 public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Adapter<MovieShowsAdapter.MovieViewHolder>
@@ -80,12 +74,12 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
         View view;
         switch (viewType)
         {
-            case MOVIE_SHOWS_VIEW_TYPE:
-                view = LayoutInflater.from(context).inflate(R.layout.movie_show_list_item, parent, false);
-                return new MovieShowViewHolder(view);
             case MOVIE_DETAILS_VIEW_TYPE:
                 view = LayoutInflater.from(context).inflate(R.layout.movie_details_card, parent, false);
                 return new MovieDetailsViewHolder(view);
+            case MOVIE_SHOWS_VIEW_TYPE:
+                view = LayoutInflater.from(context).inflate(R.layout.movie_show_list_item, parent, false);
+                return new MovieShowViewHolder(view);
             default: return null;
         }
     }
@@ -112,7 +106,7 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
             movieDetailsViewHolder.movieNameTextView.setText(movieName);
             ((Activity) context).setTitle(movieName);
             movieDetailsViewHolder.movieGenreTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_GENRE)));
-            movieDetailsViewHolder.movieLimitAgeTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_LIMIT_AGE)));
+            movieDetailsViewHolder.movieLimitAgeTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_AGE_LIMIT)));
             movieDetailsViewHolder.summaryTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY)));
 
             Picasso.with(context).load(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
@@ -131,36 +125,6 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
         final long showDate = showsCursor.getLong(SHOW_DATE_COLUMN_INDEX);
         final String friendlyDayString = Utilities.getFriendlyDayString(context, showDate);
         viewHolder.showDate.setText(friendlyDayString);
-
-        viewHolder.remainderButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                final AlarmManager alarmMgr;
-                final PendingIntent alarmIntent;
-
-                alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                Activity rootActivity = (Activity) context;
-                Intent intent = new Intent(context, RemainderReceiver.class).setData(rootActivity.getIntent().getData());
-                intent.putExtra(RemainderReceiver.MOVIE_NAME_EXTRA_KEY, showsCursor.getString(MOVIE_NAME_COLUMN_INDEX));
-                intent.putExtra(RemainderReceiver.ROOT_ACTIVITY, rootActivity.getClass());
-                alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-
-                alarmMgr.set(AlarmManager.RTC_WAKEUP, showDate - 15 * 60 * 1000, alarmIntent);
-
-                Snackbar.make(v,
-                              context.getString(R.string.snackbar_remainder_set_text, friendlyDayString),
-                              Snackbar.LENGTH_LONG).setAction(R.string.cancel, new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        alarmMgr.cancel(alarmIntent);
-                    }
-                }).show();
-            }
-        });
     }
 
     @Override
@@ -180,14 +144,12 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
     class MovieShowViewHolder extends MovieViewHolder
     {
         final TextView showTheaterName;
-        final Button   remainderButton;
         final TextView showDate;
 
         public MovieShowViewHolder(View view)
         {
             super(view);
             this.showTheaterName = (TextView) view.findViewById(R.id.showTheaterName);
-            this.remainderButton = (Button) view.findViewById(R.id.remainderButton);
             this.showDate = (TextView) view.findViewById(R.id.showDate);
         }
     }

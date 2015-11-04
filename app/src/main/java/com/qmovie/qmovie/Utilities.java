@@ -6,9 +6,14 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.format.Time;
+import android.text.style.ForegroundColorSpan;
 import android.widget.EdgeEffect;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -129,5 +134,25 @@ public class Utilities
             SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
             return dayFormat.format(dateInMillis);
         }
+    }
+
+    public static void highlightTextInTextView(TextView textView,@Nullable String textToHighlight, int color)
+    {
+        String originalText = String.valueOf(textView.getText());
+        Spannable wordToSpan = new SpannableString(originalText);
+
+        if (textToHighlight == null || textToHighlight.isEmpty())
+        {
+            return;
+        }
+
+        int i = originalText.toLowerCase().indexOf(textToHighlight.toLowerCase());
+        while (i != -1)
+        {
+            wordToSpan.setSpan(new ForegroundColorSpan(color), i, i + textToHighlight.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            i = originalText.indexOf(textToHighlight, i + 1);
+        }
+
+        textView.setText(wordToSpan);
     }
 }

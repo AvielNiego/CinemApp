@@ -31,7 +31,7 @@ public class MovieDbHelper extends SQLiteOpenHelper
                 MovieEntry.COLUMN_GENRE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_SUMMARY + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_PICTURE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_LIMIT_AGE + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_AGE_LIMIT + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_TRAILER + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_MOVIE_LENGTH + " INTEGER NOT NULL, " +
                 "UNIQUE (" + MovieEntry.COLUMN_MOVIE_NAME + ", " + MovieEntry.COLUMN_PUBLISHED_YEAR + ") ON CONFLICT REPLACE);";
