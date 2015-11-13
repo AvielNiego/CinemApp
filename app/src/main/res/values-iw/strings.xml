@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <string name="moviePosterContentDescription">תמונת סרט</string>
+
+    <string name="share_action_string">בוא נלך לסרט <xliff:g id="movieName">%1$s</xliff:g>!</string>
+
+    <string name="today">היום</string>
+    <string name="tomorrow">מחר</string>
+
+    <string name="action_settings">הגדרות</string>
+    <string name="share_title">שיתוף</string>
+    <string name="cancel">ביטול</string>
+    <string name="search">חיפוש</string>
+
+    <!-- Empty movie list error messages -->
+    <string name="empty_movie_list">מידע על הסרטים אינו זמין</string>
+    <string name="empty_movie_list_no_internet">"מידע על הסרטים אינו זמין. \n אין רשת"</string>
+    <string name="empty_movie_list_no_search_re">לא נמצאו תוצאות עבור  <xliff:g id="day">%1$s</xliff:g></string>
+    <string name="empty_movie_list_server_down">"מידע על סרטים אינו זמין \n השרת לא מגיב"</string>
+    <string name="empty_movie_list_server_invalid">"מידע על הסרטים אינו זמין \n המידע שחזר מהשרת תקול"</string>
+</resources>
