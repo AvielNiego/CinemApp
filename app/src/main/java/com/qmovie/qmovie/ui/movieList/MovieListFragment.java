@@ -1,11 +1,13 @@
 package com.qmovie.qmovie.ui.movieList;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -21,11 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.qmovie.qmovie.R;
+import com.qmovie.qmovie.Utilities;
 import com.qmovie.qmovie.data.MovieContract;
+import com.qmovie.qmovie.data.UpdateDataTask;
 
-public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class MovieListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener
 {
     private static final int    HANDLER_WHAT    = 1;
     private static final int    MOVIE_LOADER    = 10;
@@ -35,6 +40,7 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private int itemSelectedPosition = ListView.INVALID_POSITION;
     private MovieAdapter movieAdapter;
     private ListView     movieListView;
+    private TextView     emptyListTextView;
 
     private String searchText;
 
@@ -67,6 +73,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
     private void initMovieListView(View rootView)
     {
         movieListView = (ListView) rootView.findViewById(R.id.moviesListView);
+
+        emptyListTextView = (TextView) rootView.findViewById(R.id.empty_list_view);
+        movieListView.setEmptyView(emptyListTextView);
         movieListView.setAdapter(movieAdapter);
         movieListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -126,12 +135,9 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
         switch (loader.getId())
         {
             case MOVIE_LOADER:
-                if (data.moveToFirst())
-                {
-                    getActivity().findViewById(R.id.movieListProgressBar).setVisibility(View.GONE);
-                }
                 movieAdapter.setSearchString(searchText);
                 movieAdapter.swapCursor(data);
+
                 if (itemSelectedPosition != ListView.INVALID_POSITION)
                 {
                     movieListView.smoothScrollToPosition(itemSelectedPosition);
@@ -140,7 +146,39 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
                 {
                     (new NotifyDataUpdated(this)).sendEmptyMessage(HANDLER_WHAT);
                 }
+
+                updateEmptyView();
                 break;
+        }
+    }
+
+    public void updateEmptyView()
+    {
+        if (movieAdapter.getCount() == 0)
+        {
+            if (searchText != null && !searchText.isEmpty())
+            {
+                emptyListTextView
+                        .setText(getActivity().getString(R.string.empty_movie_list_no_search_re, searchText));
+                return;
+            }
+
+            @UpdateDataTask.ServerStatus int serverStatus = Utilities.getServerStatus(getActivity());
+
+            switch (serverStatus)
+            {
+                case UpdateDataTask.SERVER_STATUS_SERVER_DOWN:
+                    emptyListTextView.setText(getActivity().getString(R.string.empty_movie_list_server_down));
+                    break;
+                case UpdateDataTask.SERVER_STATUS_SERVER_INVALID:
+                    emptyListTextView.setText(getActivity().getString(R.string.empty_movie_list_server_invalid));
+                    break;
+                default:
+                    if (!Utilities.isNetworkAvailable(getActivity()))
+                    {
+                        emptyListTextView.setText(getActivity().getString(R.string.empty_movie_list_no_internet));
+                    }
+            }
         }
     }
 
@@ -189,6 +227,31 @@ public class MovieListFragment extends Fragment implements LoaderManager.LoaderC
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+    {
+        if (key.equals(R.string.pref_location_status_key))
+        {
+            updateEmptyView();
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause()
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
     }
 
     private static class NotifyDataUpdated extends Handler

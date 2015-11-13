@@ -6,14 +6,20 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.data.UpdateDataTask;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public class CinemappSyncAdapter extends AbstractThreadedSyncAdapter
 {
@@ -22,11 +28,29 @@ public class CinemappSyncAdapter extends AbstractThreadedSyncAdapter
     public static final int SYNC_INTERVAL = 60 * 60 * 24;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({SERVER_STATUS_OK, SERVER_STATUS_SERVER_DOWN, SERVER_STATUS_SERVER_INVALID, SERVER_STATUS_UNKNOWN})
+    public @interface ServerStatus{}
+
+    public static final int SERVER_STATUS_OK = 0;
+    public static final int SERVER_STATUS_SERVER_DOWN = 1;
+    public static final int SERVER_STATUS_SERVER_INVALID = 2;
+    public static final int SERVER_STATUS_UNKNOWN = 3;
+
+
     public CinemappSyncAdapter(Context context, boolean autoInitialize)
     {
         super(context, autoInitialize);
     }
 
+
+    static private void setServerStatus(Context context, @ServerStatus int serverStatus)
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(context.getString(R.string.pref_location_status_key), serverStatus);
+        spe.commit();
+    }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider,

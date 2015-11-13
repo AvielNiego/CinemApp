@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        restartApplicationWhenFC();
+        //restartApplicationWhenFC();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

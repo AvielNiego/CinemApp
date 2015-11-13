@@ -22,7 +22,6 @@
             android:id="@+id/movieDetailsCollapsingToolbarLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:collapsedTitleGravity="right"
             app:contentScrim="@color/mainColor"
             app:layout_collapseMode="none"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
@@ -45,11 +44,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:paddingRight="2dp"
+                android:paddingLeft="2dp"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
                 android:theme="@style/ThemeToolbarDarkOverflow"
                 app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|enterAlways">
-
-
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -57,4 +57,3 @@
     </android.support.design.widget.AppBarLayout>
 
 </android.support.design.widget.CoordinatorLayout>
-

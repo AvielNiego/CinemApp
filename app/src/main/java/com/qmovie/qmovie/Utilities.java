@@ -1,11 +1,15 @@
 package com.qmovie.qmovie;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -14,6 +18,8 @@ import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.widget.EdgeEffect;
 import android.widget.TextView;
+
+import com.qmovie.qmovie.data.UpdateDataTask;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -154,5 +160,19 @@ public class Utilities
         }
 
         textView.setText(wordToSpan);
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    @SuppressWarnings("ResourceType")
+    static public @UpdateDataTask.ServerStatus int getServerStatus(Context context)
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getInt(context.getString(R.string.pref_location_status_key), UpdateDataTask.SERVER_STATUS_UNKNOWN);
     }
 }

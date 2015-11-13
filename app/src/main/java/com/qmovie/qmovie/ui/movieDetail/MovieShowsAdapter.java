@@ -105,12 +105,16 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
                     .getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_NAME));
             movieDetailsViewHolder.movieNameTextView.setText(movieName);
             ((Activity) context).setTitle(movieName);
-            movieDetailsViewHolder.movieGenreTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_GENRE)));
+            movieDetailsViewHolder.movieGenreTextView.setText(detailCursor.getString(detailCursor
+                                                                                             .getColumnIndex(MovieContract.MovieEntry.COLUMN_GENRE)));
             movieDetailsViewHolder.movieLimitAgeTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_AGE_LIMIT)));
             movieDetailsViewHolder.summaryTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY)));
 
             Picasso.with(context).load(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
                     .into(movieDetailsViewHolder.moviePosterImageView);
+
+            movieDetailsViewHolder.moviePosterImageView.setContentDescription(movieName.concat(" ")
+                                                                 .concat(context.getString(R.string.moviePosterContentDescription)));
         }
     }
 

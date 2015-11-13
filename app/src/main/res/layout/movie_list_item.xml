@@ -2,30 +2,29 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:minHeight="?android:attr/listPreferredItemHeight"
-              android:padding="5dp"
+              android:background="@drawable/touch_selector"
               android:baselineAligned="false"
-    android:background="@drawable/touch_selector"
-    >
+              android:minHeight="?android:attr/listPreferredItemHeight"
+              android:orientation="horizontal"
+              android:padding="5dp">
 
     <LinearLayout
         android:layout_width="0dp"
-        android:orientation="vertical"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="right|top"
+        android:orientation="vertical"
         android:paddingRight="5dp">
 
         <TextView
+            android:id="@+id/movieNameTextViewListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/movieNameTextViewListItem"
+            android:gravity="right"
             android:textAppearance="?android:textAppearance"
-            android:textSize="18sp"
-            android:gravity="right"/>
+            android:textSize="18sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,21 +32,21 @@
             android:orientation="horizontal">
 
             <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableBottom="@drawable/movie_length"
-            android:id="@+id/movieShowMinutesTextViewListItem"
-            android:gravity="end"
-            android:textAppearance="?android:textAppearanceSmall"/>
+                android:id="@+id/movieShowMinutesTextViewListItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableBottom="@drawable/movie_length"
+                android:gravity="end"
+                android:textAppearance="?android:textAppearanceSmall"/>
 
             <TextView
+                android:id="@+id/movieGenreTextViewListItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/movieGenreTextViewListItem"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:paddingBottom="5dp"
                 android:layout_weight="1"
-                android:gravity="right"/>
+                android:gravity="right"
+                android:paddingBottom="5dp"
+                android:textAppearance="?android:textAppearanceSmall"/>
 
         </LinearLayout>
 
@@ -59,9 +58,9 @@
         >
 
         <ImageView
+            android:id="@+id/moviePosterImageViewListItem"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/moviePosterImageViewListItem"
             android:contentDescription="@string/moviePosterContentDescription"
             />
     </FrameLayout>

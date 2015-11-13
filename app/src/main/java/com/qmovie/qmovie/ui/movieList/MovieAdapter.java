@@ -66,6 +66,7 @@ public class MovieAdapter extends CursorAdapter implements Filterable
         String movieName = cursor.getString(MOVIE_NAME_COLUMN_INDEX);
 
         viewHolder.nameTextView.setText(movieName);
+        viewHolder.moviePoster.setContentDescription(movieName.concat(" ").concat(context.getString(R.string.moviePosterContentDescription)));
         Utilities.highlightTextInTextView(viewHolder.nameTextView, searchString, R.attr.colorPrimary);
 
         viewHolder.genreTextView.setText(cursor.getString(MOVIE_GENRE_COLUMN_INDEX));

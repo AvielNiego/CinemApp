@@ -2,9 +2,14 @@ package com.qmovie.qmovie.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.qmovie.qmovie.R;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -21,6 +26,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -65,6 +72,23 @@ public class UpdateDataTask
     }
 
     public static final String BASE_MOVIE_SUMMARY_AND_TRAILER_URL = "http://www.cinema-city.co.il/featureInfo";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({SERVER_STATUS_OK, SERVER_STATUS_SERVER_DOWN, SERVER_STATUS_SERVER_INVALID, SERVER_STATUS_UNKNOWN})
+    public @interface ServerStatus{}
+
+    public static final int SERVER_STATUS_OK = 0;
+    public static final int SERVER_STATUS_SERVER_DOWN = 1;
+    public static final int SERVER_STATUS_SERVER_INVALID = 2;
+    public static final int SERVER_STATUS_UNKNOWN = 3;
+
+    static private void setServerStatus(Context context, @ServerStatus int serverStatus)
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(context.getString(R.string.pref_location_status_key), serverStatus);
+        spe.commit();
+    }
 
     public static void updateMovieData(Context context)
     {
@@ -126,15 +150,19 @@ public class UpdateDataTask
                             }
                         }
                     }
+
+                    setServerStatus(context, SERVER_STATUS_OK);
                 } catch (JSONException e)
                 {
                     Log.v(LOG_TAG, "Couldn't load movie number " + i);
+                    setServerStatus(context, SERVER_STATUS_SERVER_INVALID);
                 }
             }
             Log.d(LOG_TAG, "Done receiving information from internet");
         } catch (JSONException e)
         {
             e.printStackTrace();
+            setServerStatus(context, SERVER_STATUS_SERVER_INVALID);
         }
     }
 
