@@ -182,7 +182,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         if (movieCollapsingToolbarLayout != null)
         {
             movieCollapsingToolbarLayout.setTitle(movieName);
-            movieCollapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.BackgroundedText);
+
             final ImageView toolbarMoviePoster = ((ImageView) movieCollapsingToolbarLayout.findViewById(R.id.toolbarMoviePoster));
             if (toolbarMoviePoster != null)
             {
@@ -199,7 +199,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                         Drawable drawable = toolbarMoviePoster.getDrawable();
                         if (drawable != null)
                         {
-                            Palette.generateAsync(Utilities.drawableToBitmap(drawable), new Palette.PaletteAsyncListener()
+                            Palette.from(Utilities.drawableToBitmap(drawable)).generate(new Palette.PaletteAsyncListener()
                             {
                                 @Override
                                 public void onGenerated(Palette palette)
