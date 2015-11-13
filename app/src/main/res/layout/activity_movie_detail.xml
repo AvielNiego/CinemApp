@@ -24,7 +24,9 @@
             android:layout_height="match_parent"
             app:contentScrim="@color/mainColor"
             app:layout_collapseMode="none"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:collapsedTitleTextAppearance="@style/TitleCollapsedAppearance"
+            app:expandedTitleTextAppearance="@style/TitleExpendedAppearance">
 
             <ImageView
                 android:id="@+id/toolbarMoviePoster"
