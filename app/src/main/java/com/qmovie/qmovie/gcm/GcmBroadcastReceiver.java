@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.ui.MainActivity;
 
 public class GcmBroadcastReceiver extends BroadcastReceiver {
@@ -40,7 +41,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
              */
             if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // Is this our message?? Better be if you're going to act on it!
-                if (GcmUtils.PROJECT_NUMBER.equals(extras.getString(EXTRA_SENDER))) {
+                if (GcmRegister.PROJECT_NUMBER.equals(extras.getString(EXTRA_SENDER))) {
                     // Process message and then post a notification of the received message.
                     String weather = extras.getString(EXTRA_WEATHER);
                     String location = extras.getString(EXTRA_LOCATION);
@@ -65,7 +66,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setContentTitle("Weather Alert!")
+                        .setContentTitle("Weather Alert!").setSmallIcon(R.mipmap.ic_launcher)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                           .bigText(msg))
                         .setContentText(msg)

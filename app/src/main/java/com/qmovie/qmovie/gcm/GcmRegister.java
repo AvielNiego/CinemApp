@@ -15,12 +15,12 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
-public class GcmUtils
+public class GcmRegister
 {
     private final static int    PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static final  String PROPERTY_REG_ID                  = "registration_id";
     private static final String PROPERTY_APP_VERSION             = "appVersion";
-    private static final String LOG_TAG                          = GcmUtils.class.getSimpleName();
+    private static final String LOG_TAG                          = GcmRegister.class.getSimpleName();
 
     /**
      * Substitute you own project number here. This project number comes
@@ -108,7 +108,7 @@ public class GcmUtils
      * @return Application's {@code SharedPreferences}.
      */
     private static SharedPreferences getGCMPreferences(Context context) {
-        return context.getSharedPreferences(GcmUtils.class.getSimpleName(), Context.MODE_PRIVATE);
+        return context.getSharedPreferences(GcmRegister.class.getSimpleName(), Context.MODE_PRIVATE);
     }
 
     /**

@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.qmovie.qmovie.gcm.GcmUtils;
+import com.qmovie.qmovie.gcm.GcmRegister;
 import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.sync.CinemappSyncAdapter;
 import com.qmovie.qmovie.ui.movieDetail.MovieDetailActivity;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
     {
         super.onResume();
 
-        GcmUtils.tryRegistering(this);
+        GcmRegister.tryRegistering(this);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         twoPane = (findViewById(R.id.movieDetailContainer) != null);
         hasSavedInstanceState = (savedInstanceState != null);
 
-        GcmUtils.tryRegistering(this);
+        GcmRegister.tryRegistering(this);
         CinemappSyncAdapter.initializeSyncAdapter(this);
     }
 

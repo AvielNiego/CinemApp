@@ -12,8 +12,8 @@
     <!-- Permissions required for Google Cloud Messaging -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <permission
-        android:name="com.qmovie.qmovie.app.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
-    <uses-permission android:name="com.qmovie.qmovie.app.permission.C2D_MESSAGE"/>
+        android:name="com.qmovie.qmovie.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
+    <uses-permission android:name="com.qmovie.qmovie.permission.C2D_MESSAGE"/>
 
     <application
         android:allowBackup="true"
@@ -67,10 +67,14 @@
             android:exported="false"
             android:syncable="true" />
 
-        <receiver android:name=".gcm.GcmBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+
+        <!-- GCM receiver -->
+        <receiver
+            android:name=".gcm.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
-                <action android:name="com.googele.android.c2dm.intent.RECEIVE"/>
-                <action android:name="com.qmovie.qmovie.app"/>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.qmovie.qmovie" />
             </intent-filter>
         </receiver>
         
