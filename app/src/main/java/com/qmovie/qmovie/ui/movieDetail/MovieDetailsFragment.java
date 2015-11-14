@@ -91,10 +91,9 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
 
 
         movieShowAdapter = new MovieShowsAdapter(getActivity(), null, null);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         showsRecyclerView = (RecyclerView) rootView.findViewById(R.id.showsRecycleView);
-        showsRecyclerView.setLayoutManager(layoutManager);
+        showsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         showsRecyclerView.setAdapter(movieShowAdapter);
 
         return rootView;
