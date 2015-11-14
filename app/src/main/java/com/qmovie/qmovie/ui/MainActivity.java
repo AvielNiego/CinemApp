@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.qmovie.qmovie.gcm.GcmUtils;
 import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.sync.CinemappSyncAdapter;
 import com.qmovie.qmovie.ui.movieDetail.MovieDetailActivity;
@@ -19,12 +20,12 @@ import com.qmovie.qmovie.ui.movieList.MovieListFragment;
 
 public class MainActivity extends AppCompatActivity implements MovieListFragment.Callback
 {
-    private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
-    public static final int TIME_TO_WAIT_BEFORE_RESTART = 500;
+    private static final String DETAIL_FRAGMENT_TAG         = "DETAIL_FRAGMENT_TAG";
+    public static final  int    TIME_TO_WAIT_BEFORE_RESTART = 500;
 
-    private boolean           twoPane;
-    private boolean           hasSavedInstanceState;
-    private MovieListFragment movieListFragment;
+    private boolean              twoPane;
+    private boolean              hasSavedInstanceState;
+    private MovieListFragment    movieListFragment;
 
     public MovieListFragment getMovieListFragment()
     {
@@ -34,6 +35,14 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         }
 
         return movieListFragment;
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        GcmUtils.tryRegistering(this);
     }
 
     @Override
@@ -49,8 +58,11 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
         twoPane = (findViewById(R.id.movieDetailContainer) != null);
         hasSavedInstanceState = (savedInstanceState != null);
 
+        GcmUtils.tryRegistering(this);
         CinemappSyncAdapter.initializeSyncAdapter(this);
     }
+
+
 
     private void restartApplicationWhenFC()
     {
