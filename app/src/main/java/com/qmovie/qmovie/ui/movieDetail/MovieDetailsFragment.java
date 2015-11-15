@@ -128,7 +128,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
                                         MovieShowsAdapter.PROJECTION,
                                         null,
                                         null,
-                                        null);
+                                        MovieShowsAdapter.SORT_ORDER);
             default:
                 return null;
         }
@@ -185,69 +185,7 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
             final ImageView toolbarMoviePoster = ((ImageView) movieCollapsingToolbarLayout.findViewById(R.id.toolbarMoviePoster));
             if (toolbarMoviePoster != null)
             {
-                int widthPixels = getActivity().getResources().getDisplayMetrics().widthPixels;
-                int heightPixels = (int) getResources().getDimension(R.dimen.toolbar_height);
-
-                Picasso.with(getActivity())
-                        .load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
-                        .resize(widthPixels, heightPixels).centerCrop().into(toolbarMoviePoster, new Callback()
-                {
-                    @Override
-                    public void onSuccess()
-                    {
-                        Drawable drawable = toolbarMoviePoster.getDrawable();
-                        if (drawable != null)
-                        {
-                            Palette.from(Utilities.drawableToBitmap(drawable)).generate(new Palette.PaletteAsyncListener()
-                            {
-                                @Override
-                                public void onGenerated(Palette palette)
-                                {
-                                    if (palette == null)
-                                    {
-                                        return;
-                                    }
-
-                                    int rgb;
-                                    if (palette.getVibrantSwatch() != null)
-                                    {
-                                        rgb = palette.getVibrantSwatch().getRgb();
-                                    }
-                                    else if(palette.getMutedSwatch() != null)
-                                    {
-                                        rgb = palette.getMutedSwatch().getRgb();
-                                    }
-                                    else
-                                    {
-                                        return;
-                                    }
-
-                                    movieCollapsingToolbarLayout.setContentScrim(new ColorDrawable(rgb));
-
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                                    {
-                                        Window window = getActivity().getWindow();
-                                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-                                        float[] hsv = new float[3];
-                                        Color.colorToHSV(rgb, hsv);
-                                        hsv[2] *= 0.7f; // value component
-
-                                        window.setStatusBarColor(Color.HSVToColor(hsv));
-                                    }
-
-                                    Utilities.setEdgeGlowColor(showsRecyclerView, rgb);
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onError()
-                    {
-
-                    }
-                });
+                putPosterInToolbar(data, movieCollapsingToolbarLayout, toolbarMoviePoster);
             }
         }
 
@@ -256,6 +194,76 @@ public class MovieDetailsFragment extends Fragment implements LoaderManager.Load
         {
             shareActionProvider.setShareIntent(createShareIntent());
         }
+    }
+
+    public void putPosterInToolbar(Cursor data, final CollapsingToolbarLayout movieCollapsingToolbarLayout,
+                                   final ImageView toolbarMoviePoster)
+    {
+        int widthPixels = getActivity().getResources().getDisplayMetrics().widthPixels;
+        int heightPixels = (int) getResources().getDimension(R.dimen.toolbar_height);
+
+        Picasso.with(getActivity())
+                .load(data.getString(data.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
+                .resize(widthPixels, heightPixels)
+                .centerCrop().into(toolbarMoviePoster, new Callback()
+        {
+            @Override
+            public void onSuccess()
+            {
+                Drawable drawable = toolbarMoviePoster.getDrawable();
+                if (drawable != null)
+                {
+                    Palette.from(Utilities.drawableToBitmap(drawable)).generate(new Palette.PaletteAsyncListener()
+                    {
+                        @Override
+                        public void onGenerated(Palette palette)
+                        {
+                            if (palette == null)
+                            {
+                                return;
+                            }
+
+                            int rgb;
+                            if (palette.getVibrantSwatch() != null)
+                            {
+                                rgb = palette.getVibrantSwatch().getRgb();
+                            }
+                            else if (palette.getMutedSwatch() != null)
+                            {
+                                rgb = palette.getMutedSwatch().getRgb();
+                            }
+                            else
+                            {
+                                return;
+                            }
+
+                            ColorDrawable c = new ColorDrawable(rgb);
+                            movieCollapsingToolbarLayout.setContentScrim(c);
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            {
+                                Window window = getActivity().getWindow();
+                                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+                                float[] hsv = new float[3];
+                                Color.colorToHSV(rgb, hsv);
+                                hsv[2] *= 0.7f; // value component
+
+                                window.setStatusBarColor(Color.HSVToColor(hsv));
+                            }
+
+                            Utilities.setEdgeGlowColor(showsRecyclerView, rgb);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError()
+            {
+
+            }
+        });
     }
 
     private Intent createShareIntent()

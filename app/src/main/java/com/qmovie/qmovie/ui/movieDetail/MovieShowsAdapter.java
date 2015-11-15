@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -15,16 +16,18 @@ import android.widget.TextView;
 import com.qmovie.qmovie.R;
 import com.qmovie.qmovie.Utilities;
 import com.qmovie.qmovie.data.MovieContract;
+import com.qmovie.qmovie.entities.Theater;
+import com.qmovie.qmovie.ui.customComponents.RecycleViewWrapContentEnableLinearLayout;
+import com.qmovie.qmovie.ui.movieDetail.movieDetailshowsPerTheater.MovieShowsPerTheaterAdapter;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Adapter<MovieShowsAdapter.MovieViewHolder>
 {
     public static final int MOVIE_DETAILS_VIEW_TYPE = 0;
     public static final int MOVIE_SHOWS_VIEW_TYPE   = 1;
-
-    private Context context;
-    @Nullable
-    private Cursor  showsCursor, detailCursor;
 
     public static final String[] PROJECTION = {
             MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry._ID,
@@ -32,18 +35,51 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
             MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME,
             MovieContract.ShowEntry.TABLE_NAME + "." + MovieContract.ShowEntry.COLUMN_SHOW_DATE};
 
+    public static final String SORT_ORDER = MovieContract.TheaterEntry.TABLE_NAME + "." +
+            MovieContract.TheaterEntry.COLUMN_THEATER_NAME + " DESC," +
+            MovieContract.ShowEntry.COLUMN_SHOW_DATE;
+
     public static final int SHOW_ID_COLUMN_INDEX = 0;
 
-    public static final int MOVIE_NAME_COLUMN_INDEX   = 1;
+    public static final int MOVIE_NAME_COLUMN_INDEX = 1;
+
     public static final int THEATER_NAME_COLUMN_INDEX = 2;
     public static final int SHOW_DATE_COLUMN_INDEX    = 3;
+
+    private Context context;
+    @Nullable
+    private Cursor  showsCursor, detailCursor;
+    private List<Theater> theaters;
 
 
     public MovieShowsAdapter(Context context, @Nullable Cursor showsCursor, @Nullable Cursor detailCursor)
     {
         this.context = context;
         this.showsCursor = showsCursor;
+        readShowsCursor(context, showsCursor);
         this.detailCursor = detailCursor;
+    }
+
+    public void readShowsCursor(Context context, @Nullable Cursor showsCursor)
+    {
+        this.theaters = new ArrayList<>();
+
+        if (showsCursor != null && showsCursor.moveToFirst())
+        {
+            String lastTheaterName = showsCursor.getString(THEATER_NAME_COLUMN_INDEX);
+            Theater theater = new Theater(new ArrayList<String>(), lastTheaterName);
+            theater.getShows().add(Utilities.getFriendlyDayString(context, showsCursor.getLong(SHOW_DATE_COLUMN_INDEX)));
+            while (showsCursor.moveToNext())
+            {
+                if (!lastTheaterName.equals(showsCursor.getString(THEATER_NAME_COLUMN_INDEX)))
+                {
+                    theaters.add(theater);
+                    theater = new Theater(new ArrayList<String>(), showsCursor.getString(THEATER_NAME_COLUMN_INDEX));
+                }
+                theater.getShows().add(Utilities.getFriendlyDayString(context, showsCursor.getLong(SHOW_DATE_COLUMN_INDEX)));
+                lastTheaterName = showsCursor.getString(THEATER_NAME_COLUMN_INDEX);
+            }
+        }
     }
 
     @Nullable
@@ -80,61 +116,72 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
             case MOVIE_SHOWS_VIEW_TYPE:
                 view = LayoutInflater.from(context).inflate(R.layout.movie_show_list_item, parent, false);
                 return new MovieShowViewHolder(view);
-            default: return null;
+            default:
+                return null;
         }
     }
 
     @Override
     public void onBindViewHolder(MovieViewHolder viewHolder, int position)
     {
-        if (viewHolder instanceof MovieShowViewHolder)
+        if (viewHolder instanceof MovieDetailsViewHolder)
+        {
+            bindMovieDetailsViewHolder((MovieDetailsViewHolder) viewHolder);
+        }
+        else if (viewHolder instanceof MovieShowViewHolder)
         {
             bindShowsViewHolder((MovieShowViewHolder) viewHolder, position);
         }
-
-        if (viewHolder instanceof MovieDetailsViewHolder)
-        {
-            if (detailCursor == null)
-            {
-                return;
-            }
-
-            MovieDetailsViewHolder movieDetailsViewHolder = (MovieDetailsViewHolder) viewHolder;
-
-            String movieName = detailCursor
-                    .getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_NAME));
-            movieDetailsViewHolder.movieNameTextView.setText(movieName);
-            ((Activity) context).setTitle(movieName);
-            movieDetailsViewHolder.movieGenreTextView.setText(detailCursor.getString(detailCursor
-                                                                                             .getColumnIndex(MovieContract.MovieEntry.COLUMN_GENRE)));
-            movieDetailsViewHolder.movieLimitAgeTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_AGE_LIMIT)));
-            movieDetailsViewHolder.summaryTextView.setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY)));
-
-            Picasso.with(context).load(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
-                    .into(movieDetailsViewHolder.moviePosterImageView);
-
-            movieDetailsViewHolder.moviePosterImageView.setContentDescription(movieName.concat(" ")
-                                                                 .concat(context.getString(R.string.moviePosterContentDescription)));
-        }
     }
 
-    public void bindShowsViewHolder(MovieShowViewHolder viewHolder, int position)
+    public void bindMovieDetailsViewHolder(MovieDetailsViewHolder viewHolder)
     {
-        if (!(showsCursor != null && showsCursor.moveToFirst() && showsCursor.move(position)))
+        if (detailCursor == null)
         {
             return;
         }
 
-        viewHolder.showTheaterName.setText(showsCursor.getString(THEATER_NAME_COLUMN_INDEX));
-        final long showDate = showsCursor.getLong(SHOW_DATE_COLUMN_INDEX);
-        final String friendlyDayString = Utilities.getFriendlyDayString(context, showDate);
-        viewHolder.showDate.setText(friendlyDayString);
+        String movieName = detailCursor
+                .getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_NAME));
+        viewHolder.movieNameTextView.setText(movieName);
+        ((Activity) context).setTitle(movieName);
+        viewHolder.movieGenreTextView
+                .setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_GENRE)));
+        viewHolder.movieLimitAgeTextView
+                .setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_AGE_LIMIT)));
+        viewHolder.summaryTextView
+                .setText(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SUMMARY)));
+
+        Picasso.with(context)
+                .load(detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PICTURE)))
+                .into(viewHolder.moviePosterImageView);
+
+        viewHolder.moviePosterImageView.setContentDescription(movieName.concat(" ")
+                                                                                  .concat(context.getString(R.string.moviePosterContentDescription)));
+    }
+
+    public void bindShowsViewHolder(MovieShowViewHolder viewHolder, int position)
+    {
+        if (theaters.isEmpty())
+        {
+            return;
+        }
+
+        viewHolder.showTheaterName.setText(theaters.get(position).getName());
+
+        viewHolder.showsDatePerTheaterRV
+                .setLayoutManager(new RecycleViewWrapContentEnableLinearLayout(viewHolder.showsDatePerTheaterRV.getContext(),
+                                                                               LinearLayoutManager.VERTICAL,
+                                                                               false));
+        MovieShowsPerTheaterAdapter movieShowsPerTheaterAdapter = new MovieShowsPerTheaterAdapter();
+        movieShowsPerTheaterAdapter.setData(theaters.get(position).getShows());
+        viewHolder.showsDatePerTheaterRV.setAdapter(movieShowsPerTheaterAdapter);
     }
 
     @Override
     public int getItemCount()
     {
-        return showsCursor == null ? 0 : showsCursor.getCount();
+        return theaters.size();
     }
 
     abstract class MovieViewHolder extends RecyclerView.ViewHolder
@@ -147,14 +194,14 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
 
     class MovieShowViewHolder extends MovieViewHolder
     {
-        final TextView showTheaterName;
-        final TextView showDate;
+        final TextView     showTheaterName;
+        final RecyclerView showsDatePerTheaterRV;
 
         public MovieShowViewHolder(View view)
         {
             super(view);
             this.showTheaterName = (TextView) view.findViewById(R.id.showTheaterName);
-            this.showDate = (TextView) view.findViewById(R.id.showDate);
+            this.showsDatePerTheaterRV = (RecyclerView) view.findViewById(R.id.showsPerTheaterRecycleView);
         }
     }
 

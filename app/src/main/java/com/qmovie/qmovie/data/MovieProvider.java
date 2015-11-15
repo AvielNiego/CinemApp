@@ -128,7 +128,7 @@ public class MovieProvider extends ContentProvider
                                                                         sortOrder);
                 break;
             case MOVIE_WITH_SHOWS:
-                queryResult = getMovieWithShowsCursor(uri, projection);
+                queryResult = getMovieWithShowsCursor(uri, projection, sortOrder);
                 break;
             case THEATER:
                 queryResult = movieDBHelper.getReadableDatabase().query(MovieContract.TheaterEntry.TABLE_NAME,
@@ -155,7 +155,7 @@ public class MovieProvider extends ContentProvider
         return queryResult;
     }
 
-    private Cursor getMovieWithShowsCursor(Uri uri, String[] projection)
+    private Cursor getMovieWithShowsCursor(Uri uri, String[] projection, String sortOrder)
     {
         long movieId = ContentUris.parseId(uri);
 
@@ -165,8 +165,7 @@ public class MovieProvider extends ContentProvider
                                       new String[]{
                                               String.valueOf(movieId), String.valueOf(System.currentTimeMillis())},
                                       null,
-                                      null,
-                                      MovieContract.TheaterEntry.TABLE_NAME + "." + MovieContract.TheaterEntry.COLUMN_THEATER_NAME + " DESC," + MovieContract.ShowEntry.COLUMN_SHOW_DATE);
+                                      null, sortOrder);
     }
 
     @Override
