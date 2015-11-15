@@ -14,9 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.qmovie.qmovie.R;
-import com.qmovie.qmovie.Utilities;
 import com.qmovie.qmovie.data.MovieContract;
-import com.qmovie.qmovie.entities.Theater;
+import com.qmovie.qmovie.entities.showsPerTheater;
 import com.qmovie.qmovie.ui.customComponents.RecycleViewWrapContentEnableLinearLayout;
 import com.qmovie.qmovie.ui.movieDetail.movieDetailshowsPerTheater.MovieShowsPerTheaterAdapter;
 import com.squareup.picasso.Picasso;
@@ -49,36 +48,38 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
     private Context context;
     @Nullable
     private Cursor  showsCursor, detailCursor;
-    private List<Theater> theaters;
+    private List<showsPerTheater> showsPerTheaters;
 
 
     public MovieShowsAdapter(Context context, @Nullable Cursor showsCursor, @Nullable Cursor detailCursor)
     {
         this.context = context;
         this.showsCursor = showsCursor;
-        readShowsCursor(context, showsCursor);
+        readShowsCursor(showsCursor);
         this.detailCursor = detailCursor;
     }
 
-    public void readShowsCursor(Context context, @Nullable Cursor showsCursor)
+    public void readShowsCursor(@Nullable Cursor showsCursor)
     {
-        this.theaters = new ArrayList<>();
+        this.showsPerTheaters = new ArrayList<>();
 
         if (showsCursor != null && showsCursor.moveToFirst())
         {
             String lastTheaterName = showsCursor.getString(THEATER_NAME_COLUMN_INDEX);
-            Theater theater = new Theater(new ArrayList<String>(), lastTheaterName);
-            theater.getShows().add(Utilities.getFriendlyDayString(context, showsCursor.getLong(SHOW_DATE_COLUMN_INDEX)));
+            showsPerTheater showsPerTheater = new showsPerTheater(new ArrayList<Long>(), lastTheaterName);
+            showsPerTheater.getShowDates().add(showsCursor.getLong(SHOW_DATE_COLUMN_INDEX));
             while (showsCursor.moveToNext())
             {
                 if (!lastTheaterName.equals(showsCursor.getString(THEATER_NAME_COLUMN_INDEX)))
                 {
-                    theaters.add(theater);
-                    theater = new Theater(new ArrayList<String>(), showsCursor.getString(THEATER_NAME_COLUMN_INDEX));
+                    showsPerTheaters.add(showsPerTheater);
+                    showsPerTheater = new showsPerTheater(new ArrayList<Long>(),
+                                                          showsCursor.getString(THEATER_NAME_COLUMN_INDEX));
                 }
-                theater.getShows().add(Utilities.getFriendlyDayString(context, showsCursor.getLong(SHOW_DATE_COLUMN_INDEX)));
+                showsPerTheater.getShowDates().add(showsCursor.getLong(SHOW_DATE_COLUMN_INDEX));
                 lastTheaterName = showsCursor.getString(THEATER_NAME_COLUMN_INDEX);
             }
+            showsPerTheaters.add(showsPerTheater);
         }
     }
 
@@ -141,8 +142,7 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
             return;
         }
 
-        String movieName = detailCursor
-                .getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_NAME));
+        String movieName = detailCursor.getString(detailCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_NAME));
         viewHolder.movieNameTextView.setText(movieName);
         ((Activity) context).setTitle(movieName);
         viewHolder.movieGenreTextView
@@ -157,31 +157,35 @@ public class MovieShowsAdapter extends android.support.v7.widget.RecyclerView.Ad
                 .into(viewHolder.moviePosterImageView);
 
         viewHolder.moviePosterImageView.setContentDescription(movieName.concat(" ")
-                                                                                  .concat(context.getString(R.string.moviePosterContentDescription)));
+                                                                      .concat(context.getString(R.string.moviePosterContentDescription)));
     }
 
     public void bindShowsViewHolder(MovieShowViewHolder viewHolder, int position)
     {
-        if (theaters.isEmpty())
+        if (showsPerTheaters.isEmpty())
         {
             return;
         }
 
-        viewHolder.showTheaterName.setText(theaters.get(position).getName());
+        // the position counts the details view too, so we need to subtract it
+        position--;
+
+        viewHolder.showTheaterName.setText(showsPerTheaters.get(position).getTheaterName());
 
         viewHolder.showsDatePerTheaterRV
                 .setLayoutManager(new RecycleViewWrapContentEnableLinearLayout(viewHolder.showsDatePerTheaterRV.getContext(),
                                                                                LinearLayoutManager.VERTICAL,
                                                                                false));
-        MovieShowsPerTheaterAdapter movieShowsPerTheaterAdapter = new MovieShowsPerTheaterAdapter();
-        movieShowsPerTheaterAdapter.setData(theaters.get(position).getShows());
+        MovieShowsPerTheaterAdapter movieShowsPerTheaterAdapter = new MovieShowsPerTheaterAdapter(viewHolder.showsDatePerTheaterRV.getContext(),
+                                                                                                  showsPerTheaters.get(position).getShowDates());
         viewHolder.showsDatePerTheaterRV.setAdapter(movieShowsPerTheaterAdapter);
     }
 
     @Override
     public int getItemCount()
     {
-        return theaters.size();
+        // Adds 1 for the details view
+        return showsPerTheaters.size() + 1;
     }
 
     abstract class MovieViewHolder extends RecyclerView.ViewHolder

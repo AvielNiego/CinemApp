@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Utilities
 {
@@ -68,6 +69,22 @@ public class Utilities
                 }
             } catch (final Exception ignored) {}
         }
+    }
+
+    public static String millisToHour(long millis)
+    {
+        if(millis < 0)
+        {
+            return "NaN";
+        }
+
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        millis -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+
+        return String.format("%02d:%02d", hours, minutes);
     }
 
     public static String getFriendlyDayString(Context context, long dateInMillis) {
@@ -118,7 +135,6 @@ public class Utilities
      * Given a day, returns just the name to use for that day.
      * E.g "today", "tomorrow", "wednesday".
      *
-     * @param context Context to use for resource localization
      * @param dateInMillis The date in milliseconds
      */
     public static String getDayName(Context context, long dateInMillis) {
@@ -140,6 +156,11 @@ public class Utilities
             SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
             return dayFormat.format(dateInMillis);
         }
+    }
+
+    public static double millisToDay(long millis)
+    {
+        return Math.floor(millis / (1000 * 60 * 60 * 24));
     }
 
     public static void highlightTextInTextView(TextView textView,@Nullable String textToHighlight, int color)

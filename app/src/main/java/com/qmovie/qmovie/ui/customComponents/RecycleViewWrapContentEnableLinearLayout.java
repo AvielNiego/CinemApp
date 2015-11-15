@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 public class RecycleViewWrapContentEnableLinearLayout extends LinearLayoutManager
 {
-
     public RecycleViewWrapContentEnableLinearLayout(Context context, int orientation, boolean reverseLayout)    {
         super(context, orientation, reverseLayout);
     }
@@ -25,17 +24,24 @@ public class RecycleViewWrapContentEnableLinearLayout extends LinearLayoutManage
         int width = 0;
         int height = 0;
         for (int i = 0; i < getItemCount(); i++) {
-            measureScrapChild(recycler, i,
-                              View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
-                              View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
-                              mMeasuredDimension);
+
 
             if (getOrientation() == HORIZONTAL) {
+
+                measureScrapChild(recycler, i,
+                                  View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
+                                  heightSpec,
+                                  mMeasuredDimension);
+
                 width = width + mMeasuredDimension[0];
                 if (i == 0) {
                     height = mMeasuredDimension[1];
                 }
             } else {
+                measureScrapChild(recycler, i,
+                                  widthSpec,
+                                  View.MeasureSpec.makeMeasureSpec(i, View.MeasureSpec.UNSPECIFIED),
+                                  mMeasuredDimension);
                 height = height + mMeasuredDimension[1];
                 if (i == 0) {
                     width = mMeasuredDimension[0];
@@ -62,9 +68,11 @@ public class RecycleViewWrapContentEnableLinearLayout extends LinearLayoutManage
     private void measureScrapChild(RecyclerView.Recycler recycler, int position, int widthSpec,
                                    int heightSpec, int[] measuredDimension) {
         View view = recycler.getViewForPosition(position);
+        recycler.bindViewToPosition(view, position);
         if (view != null) {
             RecyclerView.LayoutParams p = (RecyclerView.LayoutParams) view.getLayoutParams();
-            int childWidthSpec = ViewGroup.getChildMeasureSpec(widthSpec, getPaddingLeft() + getPaddingRight(), p.width);
+            int childWidthSpec = ViewGroup.getChildMeasureSpec(widthSpec,
+                                                               getPaddingLeft() + getPaddingRight(), p.width);
             int childHeightSpec = ViewGroup.getChildMeasureSpec(heightSpec,
                                                                 getPaddingTop() + getPaddingBottom(), p.height);
             view.measure(childWidthSpec, childHeightSpec);

@@ -1,6 +1,7 @@
 package com.qmovie.qmovie.ui.movieDetail.movieDetailshowsPerTheater;
 
-import android.support.annotation.Nullable;
+import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,24 +9,40 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.qmovie.qmovie.R;
+import com.qmovie.qmovie.Utilities;
+import com.qmovie.qmovie.entities.showsPerDay;
+import com.qmovie.qmovie.ui.customComponents.RecycleViewWrapContentEnableLinearLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MovieShowsPerTheaterAdapter extends android.support.v7.widget.RecyclerView.Adapter<MovieShowsPerTheaterAdapter.MovieShowsPerTheater>
+public class MovieShowsPerTheaterAdapter
+        extends android.support.v7.widget.RecyclerView.Adapter<MovieShowsPerTheaterAdapter.MovieShowsPerTheater>
 {
 
-    @Nullable
-    private List<String> data;
+    private List<showsPerDay> showsPerDays = new ArrayList<>();
 
-    @Nullable
-    public List<String> getData()
+    public MovieShowsPerTheaterAdapter(Context context, List<Long> showDatesForTheater)
     {
-        return data;
+        readShowDatesForTheater(context, showDatesForTheater);
     }
 
-    public void setData(@Nullable List<String> data)
+    private void readShowDatesForTheater(Context context, List<Long> showDatesForTheater)
     {
-        this.data = data;
+        Long lastDate = showDatesForTheater.get(0);
+        showsPerDay showsPerDay = new showsPerDay(Utilities.getDayName(context, lastDate), new ArrayList<Long>());
+        showsPerDay.getHours().add(lastDate);
+        for (int i = 1; i < showDatesForTheater.size(); i++)
+        {
+            if (Utilities.millisToDay(lastDate) != Utilities.millisToDay(showDatesForTheater.get(i)))
+            {
+                showsPerDays.add(showsPerDay);
+                showsPerDay = new showsPerDay(Utilities.getDayName(context, showDatesForTheater.get(i)), new ArrayList<Long>());
+            }
+            lastDate = showDatesForTheater.get(i);
+            showsPerDay.getHours().add(showDatesForTheater.get(i));
+        }
+        showsPerDays.add(showsPerDay);
     }
 
     @Override
@@ -38,9 +55,15 @@ public class MovieShowsPerTheaterAdapter extends android.support.v7.widget.Recyc
     @Override
     public void onBindViewHolder(MovieShowsPerTheater holder, int position)
     {
-        if(data != null && data.size() > 0)
+        if (showsPerDays != null && showsPerDays.size() > 0)
         {
-            holder.showDateTextView.setText(data.get(position));
+            holder.showDateTextView
+                    .setText(showsPerDays.get(position).getDayName());
+            holder.datesRecyclerView
+                    .setLayoutManager(new RecycleViewWrapContentEnableLinearLayout(holder.datesRecyclerView.getContext(),
+                                                                                   LinearLayoutManager.HORIZONTAL,
+                                                                                   false));
+            holder.datesRecyclerView.setAdapter(new DatesPerTheaterPerMoviesAdapter(showsPerDays.get(position).getHours()));
         }
         else
         {
@@ -51,18 +74,20 @@ public class MovieShowsPerTheaterAdapter extends android.support.v7.widget.Recyc
     @Override
     public int getItemCount()
     {
-        return data != null ? data.size() : 0;
+        return showsPerDays.size();
     }
 
     public class MovieShowsPerTheater extends RecyclerView.ViewHolder
     {
-        TextView showDateTextView;
+        TextView     showDateTextView;
+        RecyclerView datesRecyclerView;
 
         public MovieShowsPerTheater(View itemView)
         {
             super(itemView);
 
-            showDateTextView = (TextView) itemView.findViewById(R.id.showTimeForTheaterTextView);
+            showDateTextView = (TextView) itemView.findViewById(R.id.showTimeForTheaterDateTextView);
+            datesRecyclerView = (RecyclerView) itemView.findViewById(R.id.showTimeForTheaterHourRecyclerView);
         }
     }
 }

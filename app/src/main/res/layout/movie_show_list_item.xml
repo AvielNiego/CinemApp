@@ -28,13 +28,6 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"/>
 
-        <!--<TextView-->
-            <!--android:id="@+id/showDate"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:padding="5dp"-->
-            <!--android:textAppearance="?attr/textAppearanceListItemSmall"/>-->
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/showsPerTheaterRecycleView"
             android:layout_width="match_parent"
